@@ -11,7 +11,6 @@ import static org.junit.Assert.assertThat;
  *@author dgagarsky
  *@since 01.12.2016
 */
-
 public class CalculateTest {
 	/**
 	 *Test print in console.
