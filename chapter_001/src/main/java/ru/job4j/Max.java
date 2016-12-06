@@ -23,7 +23,6 @@ public class Max {
 	* @return maximum.
 	*/
 	public int max(int first, int second, int third) {
-		int firstOrSecond = first >= second ? first : second;
-		return third >= firstOrSecond ? third : firstOrSecond;
+		return max(max(first, second), third);
 	}
 }
