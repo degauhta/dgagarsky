@@ -60,7 +60,7 @@
                 <version>2.7</version>
                 <configuration>
                     <check>
-                        <branchRate>60</branchRate>
+                        <branchRate>50</branchRate>
                         <lineRate>60</lineRate>
                         <haltOnFailure>true</haltOnFailure>
                         <totalBranchRate>60</totalBranchRate>
