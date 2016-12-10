@@ -15,7 +15,6 @@ public class Duplicate {
 		int countOfDublicate = 0;
 		int index = 1;
 		String temp;
-		String[] result = Arrays.copyOf(values, 1);
 		while (countOfDublicate + index < values.length) {
 			for (int i = 0; i < index; i++) {
 				if (values[i].equals(values[index])) {
