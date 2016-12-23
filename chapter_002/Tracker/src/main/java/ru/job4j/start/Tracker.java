@@ -1,6 +1,8 @@
 package ru.job4j.start;
 
+import ru.job4j.models.Bug;
 import ru.job4j.models.Item;
+import ru.job4j.models.Task;
 
 /**
  * Created by Denis on 18.12.2016.
@@ -80,11 +82,15 @@ public class Tracker {
      * @return edited request.
      */
     public Item editRequest(Item item, String name, String description) {
-        if (name != null) {
-            item.setName(name);
-        }
-        if (description != null) {
-            item.setDescription(description);
+        for (int i = 0; i != position; i++) {
+            if (this.items[i] == item) {
+                if (name != null) {
+                    item.setName(name);
+                }
+                if (description != null) {
+                    item.setDescription(description);
+                }
+            }
         }
         return item;
     }
@@ -109,5 +115,19 @@ public class Tracker {
             }
         }
         return result;
+    }
+
+    /**
+     * Main method.
+     * @param args - args.
+     */
+    public static void main(final String[] args) {
+        Tracker tracker = new Tracker();
+        tracker.add(new Item("item", "item desc", 1L));
+        tracker.add(new Task("task", "task desc", 1L));
+        tracker.add(new Bug("bug", "bug desc", 1L));
+        for (Item item : tracker.getAll()) {
+            System.out.println(item.getName());
+        }
     }
 }
