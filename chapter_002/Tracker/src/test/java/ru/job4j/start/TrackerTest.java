@@ -115,7 +115,9 @@ public class TrackerTest {
      */
     @Test
     public void editRequest() throws Exception {
-        Item actual = trackerFull.editRequest(secondTestItem, "newName", "newDescription");
+        Item actual = new Item("newName", "newDescription", createData);
+        actual.setId(secondTestItem.getId());
+        actual = trackerFull.editRequest(actual);
         Item expected = new Item("newName", "newDescription", createData);
         expected.setId(actual.getId());
         assertThat(actual, samePropertyValuesAs(expected));

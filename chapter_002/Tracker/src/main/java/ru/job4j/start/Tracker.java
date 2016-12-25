@@ -1,8 +1,6 @@
 package ru.job4j.start;
 
-import ru.job4j.models.Bug;
 import ru.job4j.models.Item;
-import ru.job4j.models.Task;
 
 /**
  * Created by Denis on 18.12.2016.
@@ -76,23 +74,19 @@ public class Tracker {
     /**
      * Editing request.
      *
-     * @param item        request to edit.
-     * @param name        new name or null.
-     * @param description new description or null.
-     * @return edited request.
+     * @param item request to edit.
+     * @return edited request or null if request not found in tracker.
      */
-    public Item editRequest(Item item, String name, String description) {
+    public Item editRequest(Item item) {
+        Item result = null;
         for (int i = 0; i != position; i++) {
-            if (this.items[i] == item) {
-                if (name != null) {
-                    item.setName(name);
-                }
-                if (description != null) {
-                    item.setDescription(description);
-                }
+            if (item != null && item.getId().equals(this.items[i].getId())) {
+                this.items[i] = item;
+                result = item;
+                break;
             }
         }
-        return item;
+        return result;
     }
 
     /**
@@ -115,19 +109,5 @@ public class Tracker {
             }
         }
         return result;
-    }
-
-    /**
-     * Main method.
-     * @param args - args.
-     */
-    public static void main(final String[] args) {
-        Tracker tracker = new Tracker();
-        tracker.add(new Item("item", "item desc", 1L));
-        tracker.add(new Task("task", "task desc", 1L));
-        tracker.add(new Bug("bug", "bug desc", 1L));
-        for (Item item : tracker.getAll()) {
-            System.out.println(item.getName());
-        }
     }
 }
