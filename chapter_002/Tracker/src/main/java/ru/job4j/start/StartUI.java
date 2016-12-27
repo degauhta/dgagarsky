@@ -10,33 +10,18 @@ import ru.job4j.models.Item;
  */
 public class StartUI {
     /**
-     * Add request.
-     */
-    private final int addRequest = 1;
-    /**
-     * Edit request.
-     */
-    private final int editRequest = 2;
-    /**
-     * Delete request.
-     */
-    private final int deleteRequest = 3;
-    /**
-     * Show all request.
-     */
-    private final int showAllRequests = 4;
-    /**
-     * Show filtered request.
-     */
-    private final int showFilteredRequests = 5;
-    /**
-     * Exit menu.
-     */
-    private final int exitMenu = 6;
-    /**
      * Console input.
      */
-    private ConsoleInput consoleInput = new ConsoleInput();
+    private Input input;
+
+    /**
+     * Constructor.
+     *
+     * @param input console input.
+     */
+    public StartUI(Input input) {
+        this.input = input;
+    }
 
     /**
      * Main method.
@@ -44,54 +29,68 @@ public class StartUI {
      * @param args - args.
      */
     public static void main(final String[] args) {
-        StartUI startUI = new StartUI();
+        Input input = new ConsoleInput();
+        new StartUI(input).init();
+    }
+
+    /**
+     * Initialization.
+     */
+    public void init() {
+        final int addRequest = 1;
+        final int editRequest = 2;
+        final int deleteRequest = 3;
+        final int showAllRequests = 4;
+        final int showFilteredRequests = 5;
+        final int exitMenu = 6;
         Tracker tracker = new Tracker();
+
         int menuCode = -1;
         String name;
         String description;
         String sub;
         do {
-            menuCode = startUI.getMenu();
-            if (menuCode == startUI.addRequest) {
-                name = startUI.consoleInput.ask("Enter name of request");
-                description = startUI.consoleInput.ask("Enter description of request");
+            menuCode = this.getMenu();
+            if (menuCode == addRequest) {
+                name = input.ask("Enter name of request");
+                description = input.ask("Enter description of request");
                 tracker.add(new Item(name, description, 1L));
-            } else if (menuCode == startUI.editRequest) {
-                int position = Integer.parseInt(startUI.consoleInput.ask("Enter number of request:"));
+            } else if (menuCode == editRequest) {
+                int position = Integer.parseInt(input.ask("Enter number of request:"));
                 Item[] items = tracker.getAll();
                 if (position < 1 || position > items.length) {
                     System.out.println("Sorry, but you choose not existing request.");
                 } else {
-                    name = startUI.consoleInput.ask("Enter new name of request");
-                    description = startUI.consoleInput.ask("Enter new description of request");
+                    name = input.ask("Enter new name of request");
+                    description = input.ask("Enter new description of request");
                     Item editedItem = new Item(name, description, 1L);
                     editedItem.setId(items[position - 1].getId());
                     tracker.editRequest(editedItem);
                 }
-            } else if (menuCode == startUI.deleteRequest) {
-                int position = Integer.parseInt(startUI.consoleInput.ask("Enter number of request:")) + 1;
+            } else if (menuCode == deleteRequest) {
+                int position = Integer.parseInt(input.ask("Enter number of request:"));
                 Item[] items = tracker.getAll();
                 if (position < 1 || position > items.length) {
                     System.out.println("Sorry, but you choose not existing request.");
                 } else {
                     tracker.removeRequest(items[position - 1]);
                 }
-            } else if (menuCode == startUI.showAllRequests) {
+            } else if (menuCode == showAllRequests) {
                 int i = 1;
                 for (Item items : tracker.getAll()) {
                     System.out.println(i++ + ") name=" + items.getName()
                             + ", description=" + items.getDescription());
                 }
-            } else if (menuCode == startUI.showFilteredRequests) {
+            } else if (menuCode == showFilteredRequests) {
                 int i = 1;
-                sub = startUI.consoleInput.ask("Enter substring for search: ");
+                sub = input.ask("Enter substring for search: ");
                 for (Item items : tracker.filterRequest(sub)) {
                     System.out.println(i++ + ") name=" + items.getName()
                             + ", description=" + items.getDescription());
                 }
             }
             System.out.println();
-        } while (menuCode != startUI.exitMenu);
+        } while (menuCode != exitMenu);
     }
 
     /**
@@ -100,12 +99,17 @@ public class StartUI {
      * @return user choose.
      */
     private int getMenu() {
-        String[] mainMenu = {"1. Add new request.",
-                "2. Edit request",
-                "3. Delete request",
-                "4. Show all request",
-                "5. Show filtered request",
-                "6. Exit"};
-        return consoleInput.chooseMenu(mainMenu);
+        String newLine = System.getProperty("line.separator");
+        System.out.println("Main menu:");
+        String mainMenu = "1) Add new request" + newLine + "2) Edit request"
+                + newLine + "3) Delete request" + newLine + "4) Show all request"
+                + newLine + "5) Show filtered request" + newLine + "6) Exit"
+                + newLine + "choose menu element:";
+        int result = -1;
+        int menuCount = (mainMenu.length() - mainMenu.replaceAll("[1234567890][)]", "").length()) / 2;
+        do {
+            result = Integer.parseInt(input.ask(mainMenu));
+        } while (result < 1 || result > menuCount);
+        return result;
     }
 }
