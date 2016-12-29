@@ -13,14 +13,20 @@ public class StartUI {
      * Console input.
      */
     private Input input;
+    /**
+     * Tracker.
+     */
+    private Tracker tracker;
 
     /**
      * Constructor.
      *
      * @param input console input.
+     * @param tracker tracker.
      */
-    public StartUI(Input input) {
+    public StartUI(Input input, Tracker tracker) {
         this.input = input;
+        this.tracker = tracker;
     }
 
     /**
@@ -30,7 +36,8 @@ public class StartUI {
      */
     public static void main(final String[] args) {
         Input input = new ConsoleInput();
-        new StartUI(input).init();
+        Tracker tracker = new Tracker();
+        new StartUI(input, tracker).init();
     }
 
     /**
@@ -43,8 +50,6 @@ public class StartUI {
         final int showAllRequests = 4;
         final int showFilteredRequests = 5;
         final int exitMenu = 6;
-        Tracker tracker = new Tracker();
-
         int menuCode = -1;
         String name;
         String description;
