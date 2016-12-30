@@ -23,9 +23,9 @@ public class StartUITest {
         long createData = 1L;
         itemArray[0] = new Item("firstTestItem", "desc firstTestItem", createData);
         itemArray[1] = new Item("secondTestItem", "desc secondTestItem", createData);
-        StubInput input = new StubInput(new String[]{"1", "firstTestItem", "desc firstTestItem",
-                "1", "secondTestItem", "desc secondTestItem", //"6"});
-                "6"});
+        StubInput input = new StubInput(new String[]{"0", "firstTestItem", "desc firstTestItem", "n",
+                "0", "secondTestItem", "desc secondTestItem",
+                "y"});
         Tracker tracker = new Tracker();
         StartUI ui = new StartUI(input, tracker);
         ui.init();
@@ -43,9 +43,9 @@ public class StartUITest {
         Item[] itemArray = new Item[length];
         long createData = 1L;
         itemArray[0] = new Item("firstTestItem-edit", "desc firstTestItem", createData);
-        StubInput input = new StubInput(new String[]{"1", "firstTestItem", "desc firstTestItem",
-                "2", "1", "firstTestItem-edit", "firstTestItem",
-                "6"});
+        StubInput input = new StubInput(new String[]{"0", "firstTestItem", "desc firstTestItem", "n",
+                "1", "1", "firstTestItem-edit", "firstTestItem",
+                "y"});
         Tracker tracker = new Tracker();
         StartUI ui = new StartUI(input, tracker);
         ui.init();
@@ -62,10 +62,10 @@ public class StartUITest {
         Item[] itemArray = new Item[length];
         long createData = 1L;
         itemArray[0] = new Item("firstTestItem", "desc firstTestItem", createData);
-        StubInput input = new StubInput(new String[]{"1", "firstTestItem", "desc firstTestItem",
-                "1", "secondTestItem", "desc secondTestItem", //"6"});
-                "3", "2",
-                "6"});
+        StubInput input = new StubInput(new String[]{"0", "firstTestItem", "desc firstTestItem", "n",
+                "0", "secondTestItem", "desc secondTestItem", "n",
+                "2", "2",
+                "y"});
         Tracker tracker = new Tracker();
         StartUI ui = new StartUI(input, tracker);
         ui.init();
@@ -83,10 +83,9 @@ public class StartUITest {
         long createData = 1L;
         itemArray[0] = new Item("firstTestItem", "disc", createData);
         itemArray[1] = new Item("secondTestItem", "desc secondTestItem", createData);
-        StubInput input = new StubInput(new String[]{"1", "firstTestItem", "disc",
-                "1", "secondTestItem", "desc secondTestItem", //"6"});
-                "5", "disc",
-                "6"});
+        StubInput input = new StubInput(new String[]{"0", "firstTestItem", "disc", "n",
+                "0", "secondTestItem", "desc secondTestItem",
+                "y"});
         Tracker tracker = new Tracker();
         StartUI ui = new StartUI(input, tracker);
         ui.init();
