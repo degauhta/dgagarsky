@@ -23,4 +23,14 @@ public class ConsoleInputTest {
         ConsoleInput consoleInput = new ConsoleInput();
         assertThat(consoleInput.ask("123"), is("123"));
     }
+
+    /**
+     * Test MenuOutException.
+     */
+    @Test(expected = MenuOutException.class)
+    public void whenWrongNumberThenMenuOutException() {
+        System.setIn(new ByteArrayInputStream("123".getBytes()));
+        ConsoleInput consoleInput = new ConsoleInput();
+        consoleInput.ask("question", new int[]{0, 1, 2});
+    }
 }

@@ -10,5 +10,6 @@
     </parent>
     <modules>
         <module>Tracker</module>
+        <module>chess</module>
     </modules>
 </project>

@@ -32,4 +32,15 @@ public class StubInput implements Input {
     public String ask(String question) {
         return this.answers[position++];
     }
+
+    /**
+     * Select menu item.
+     * @param question .
+     * @param range of menu items.
+     * @return choose.
+     */
+    public int ask(String question, int[] range) {
+        //throw new UnsupportedOperationException("Unsup operation");
+        return Integer.valueOf(this.answers[position++]);
+    }
 }

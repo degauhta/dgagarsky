@@ -39,15 +39,21 @@ public class MenuTracker {
 
     /**
      * Fill userActions.
+     * @return array of possible user action.
      */
-    public void fillAction() {
+    public int[] fillAction() {
         final int showItems = 3;
         final int filterItems = 4;
-        this.userActions[0] = new AddItem();
-        this.userActions[1] = new EditItem();
-        this.userActions[2] = new DeleteItem();
-        this.userActions[showItems] = new ShowItems();
-        this.userActions[filterItems] = new FilterItems();
+        this.userActions[0] = new AddItem("Add the new item.");
+        this.userActions[1] = new EditItem("Edit item.");
+        this.userActions[2] = new DeleteItem("Delete item.");
+        this.userActions[showItems] = new ShowItems("Show all items.");
+        this.userActions[filterItems] = new FilterItems("Filter items.");
+        int[] possibleAction = new int[userActions.length];
+        for (int i = 0; i < this.userActions.length; i++) {
+            possibleAction[i] = this.userActions[i].key();
+        }
+        return possibleAction;
     }
 
     /**
@@ -70,7 +76,15 @@ public class MenuTracker {
     /**
      * Menu item - Add Item.
      */
-    private class AddItem implements UserAction {
+    private class AddItem extends BaseAction {
+        /**
+         * Constructor.
+         * @param name of action.
+         */
+        AddItem(String name) {
+            super(name);
+        }
+
         /**
          * Menu unique key.
          *
@@ -91,21 +105,20 @@ public class MenuTracker {
             String description = input.ask("Enter description of request");
             tracker.add(new Item(name, description, 1L));
         }
-
-        /**
-         * Menu desc.
-         *
-         * @return description.
-         */
-        public String info() {
-            return String.format("%s. %s", this.key(), "Add the new item.");
-        }
     }
 
     /**
      * Menu item - Edit Item.
      */
-    private class EditItem implements UserAction {
+    private class EditItem extends BaseAction {
+        /**
+         * Constructor.
+         * @param name of action.
+         */
+        EditItem(String name) {
+            super(name);
+        }
+
         /**
          * Menu unique key.
          *
@@ -122,33 +135,32 @@ public class MenuTracker {
          * @param tracker tracker.
          */
         public void execute(Input input, Tracker tracker) {
-            int position = Integer.parseInt(input.ask("Enter number of request:"));
             Item[] items = tracker.getAll();
-            if (position < 1 || position > items.length) {
-                System.out.println("Sorry, but you choose not existing request.");
-            } else {
-                String name = input.ask("Enter new name of request");
-                String description = input.ask("Enter new description of request");
-                Item editedItem = new Item(name, description, 1L);
-                editedItem.setId(items[position - 1].getId());
-                tracker.editRequest(editedItem);
+            int[] range = new int[items.length];
+            for (int i = 0; i < range.length;) {
+                range[i] = ++i;
             }
-        }
-
-        /**
-         * Menu desc.
-         *
-         * @return description.
-         */
-        public String info() {
-            return String.format("%s. %s", this.key(), "Edit item.");
+            int position = input.ask("Enter number of request: ", range);
+            String name = input.ask("Enter new name of request");
+            String description = input.ask("Enter new description of request");
+            Item editedItem = new Item(name, description, 1L);
+            editedItem.setId(items[position - 1].getId());
+            tracker.editRequest(editedItem);
         }
     }
 
     /**
      * Menu item - delete item.
      */
-    private class DeleteItem implements UserAction {
+    private class DeleteItem extends BaseAction {
+        /**
+         * Constructor.
+         * @param name of action.
+         */
+        DeleteItem(String name) {
+            super(name);
+        }
+
         /**
          * Menu unique key.
          *
@@ -165,29 +177,28 @@ public class MenuTracker {
          * @param tracker tracker.
          */
         public void execute(Input input, Tracker tracker) {
-            int position = Integer.parseInt(input.ask("Enter number of request:"));
             Item[] items = tracker.getAll();
-            if (position < 1 || position > items.length) {
-                System.out.println("Sorry, but you choose not existing request.");
-            } else {
-                tracker.removeRequest(items[position - 1]);
+            int[] range = new int[items.length];
+            for (int i = 0; i < range.length;) {
+                range[i] = ++i;
             }
-        }
-
-        /**
-         * Menu desc.
-         *
-         * @return description.
-         */
-        public String info() {
-            return String.format("%s. %s", this.key(), "Delete item.");
+            int position = input.ask("Enter number of request: ", range);
+            tracker.removeRequest(items[position - 1]);
         }
     }
 
     /**
      * Menu item - show items.
      */
-    private class ShowItems implements UserAction {
+    private class ShowItems extends BaseAction {
+        /**
+         * Constructor.
+         * @param name of action.
+         */
+        ShowItems(String name) {
+            super(name);
+        }
+
         /**
          * Menu unique key.
          *
@@ -205,25 +216,25 @@ public class MenuTracker {
          * @param tracker tracker.
          */
         public void execute(Input input, Tracker tracker) {
+            int i = 1;
             for (Item item : tracker.getAll()) {
-                System.out.println(String.format("%s. %s", item.getId(), item.getName()));
+                System.out.println(String.format("%s. %s - %s", i++, item.getName(), item.getDescription()));
             }
-        }
-
-        /**
-         * Menu desc.
-         *
-         * @return description.
-         */
-        public String info() {
-            return String.format("%s. %s", this.key(), "Show all items.");
         }
     }
 
     /**
      * Menu item - filter items.
      */
-    private class FilterItems implements UserAction {
+    private class FilterItems extends BaseAction {
+        /**
+         * Constructor.
+         * @param name of action.
+         */
+        FilterItems(String name) {
+            super(name);
+        }
+
         /**
          * Menu unique key.
          *
@@ -243,19 +254,9 @@ public class MenuTracker {
         public void execute(Input input, Tracker tracker) {
             int i = 1;
             String sub = input.ask("Enter substring for search: ");
-            for (Item items : tracker.filterRequest(sub)) {
-                System.out.println(i++ + ") name=" + items.getName()
-                        + ", description=" + items.getDescription());
+            for (Item item : tracker.filterRequest(sub)) {
+                System.out.println(String.format("%s. %s - %s", i++, item.getName(), item.getDescription()));
             }
-        }
-
-        /**
-         * Menu desc.
-         *
-         * @return description.
-         */
-        public String info() {
-            return String.format("%s. %s", this.key(), "Filter items.");
         }
     }
 }
