@@ -58,11 +58,11 @@ public class Board {
     public boolean move(Cell source, Cell dest) throws ImpossibleMoveException,
             OccupiedWayException, FigureNotFoundException {
         boolean figureNotFound = true;
-        int indexOfMovingFigure = -1;
+        int current = -1;
         for (int i = 0; i < figures.length; i++) {
             if (figures[i] != null && figures[i].getPosition().compareCells(source)) {
                 figureNotFound = false;
-                indexOfMovingFigure = i;
+                current = i;
                 break;
             }
         }
@@ -70,7 +70,7 @@ public class Board {
             throw new FigureNotFoundException("Figure not found.");
         }
 
-        Cell[] way = figures[indexOfMovingFigure].way(dest, cells);
+        Cell[] way = figures[current].way(dest, cells);
 
         //todo if for knight
         boolean occupiedWay = false;
@@ -86,7 +86,7 @@ public class Board {
             throw new OccupiedWayException("Occupied way.");
         }
 
-        figures[indexOfMovingFigure] = figures[indexOfMovingFigure].clone(dest);
+        figures[current] = figures[current].clone(dest);
 
         return true;
     }
