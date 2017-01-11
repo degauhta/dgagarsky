@@ -57,4 +57,15 @@ public class Rook extends Figure {
         }
         throw new ImpossibleMoveException("ImpossibleMoveException");
     }
+
+    /**
+     * Clone figure to square.
+     *
+     * @param dest destination.
+     * @return clone figure.
+     */
+    @Override
+    public Figure clone(Cell dest) {
+        return new Rook(dest);
+    }
 }

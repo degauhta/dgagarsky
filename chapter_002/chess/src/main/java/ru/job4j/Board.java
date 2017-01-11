@@ -86,16 +86,8 @@ public class Board {
             throw new OccupiedWayException("Occupied way.");
         }
 
-        figures[indexOfMovingFigure] = figures[indexOfMovingFigure].clone(dest,
-                figures[indexOfMovingFigure].getClass().getName());
+        figures[indexOfMovingFigure] = figures[indexOfMovingFigure].clone(dest);
 
-/*
-        - Что в заданной ячейки есть фигура. если нет. то выкинуть исключение
-        - Если фигура есть. Проверить может ли она так двигаться. Если нет то упадет исключение
-        - Проверить что полученный путь. не занят фигурами. Если занят выкинуть исключение
-
-        - Если все отлично. Записать в ячейку новое новое положение Figure figure.clone(Cell dest)
-*/
         return true;
     }
 }

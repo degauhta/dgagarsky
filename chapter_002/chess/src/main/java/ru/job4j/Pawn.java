@@ -27,4 +27,15 @@ public class Pawn extends Figure {
     public Cell[] way(Cell dest, Cell[][] cells) throws ImpossibleMoveException {
         return new Cell[0];
     }
+
+    /**
+     * Clone figure to square.
+     *
+     * @param dest destination.
+     * @return clone figure.
+     */
+    @Override
+    public Figure clone(Cell dest) {
+        return null;
+    }
 }

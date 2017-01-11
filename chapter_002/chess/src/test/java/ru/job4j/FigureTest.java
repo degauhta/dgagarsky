@@ -18,8 +18,7 @@ public class FigureTest {
     @Test
     public void whenCloneFigureThenTrue()  {
         Cell dest = new Cell(1, 'b');
-        String className = "ru.job4j.Pawn";
-        Figure figure = new Pawn(new Cell(1, 'a'));
-        assertThat(figure.clone(dest, className).getPosition().compareCells(dest), is(true));
+        Figure figure = new Rook(new Cell(1, 'a'));
+        assertThat(figure.clone(dest).getPosition().compareCells(dest), is(true));
     }
 }
