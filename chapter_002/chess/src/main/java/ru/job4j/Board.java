@@ -57,16 +57,8 @@ public class Board {
      */
     public boolean move(Cell source, Cell dest) throws ImpossibleMoveException,
             OccupiedWayException, FigureNotFoundException {
-        boolean figureNotFound = true;
-        int current = -1;
-        for (int i = 0; i < figures.length; i++) {
-            if (figures[i] != null && figures[i].getPosition().compareCells(source)) {
-                figureNotFound = false;
-                current = i;
-                break;
-            }
-        }
-        if (figureNotFound) {
+        int current = findFigureIndexInCell(source);
+        if (current == -1) {
             throw new FigureNotFoundException("Figure not found.");
         }
 
@@ -89,5 +81,21 @@ public class Board {
         figures[current] = figures[current].clone(dest);
 
         return true;
+    }
+
+    /**
+     * Checking is the any figure in cell.
+     * @param source cell to check.
+     * @return index of figure or -1 if not found.
+     */
+    private int findFigureIndexInCell(Cell source) {
+        int current = -1;
+        for (int i = 0; i < figures.length; i++) {
+            if (figures[i] != null && figures[i].getPosition().compareCells(source)) {
+                current = i;
+                break;
+            }
+        }
+        return current;
     }
 }
