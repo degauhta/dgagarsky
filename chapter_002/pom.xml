@@ -11,5 +11,6 @@
     <modules>
         <module>Tracker</module>
         <module>chess</module>
+        <module>parentheses</module>
     </modules>
 </project>
