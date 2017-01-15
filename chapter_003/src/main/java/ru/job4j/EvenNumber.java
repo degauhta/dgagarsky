@@ -17,9 +17,8 @@ public class EvenNumber {
      * @return true if there is even number.
      */
     public boolean isNumber(InputStream in) {
-        BufferedInputStream bufferedInputStream = new BufferedInputStream(in);
         boolean result = false;
-        try {
+        try (BufferedInputStream bufferedInputStream = new BufferedInputStream(in)) {
             int number;
             while ((number = bufferedInputStream.read()) != -1) {
                 if (number % 2 == 0) {
