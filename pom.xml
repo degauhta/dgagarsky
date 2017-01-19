@@ -69,6 +69,7 @@
                             <exclude>ru/job4j/start/MenuTracker$FilterItems.class</exclude>
                             <exclude>ru/job4j/start/MenuTracker$ShowItems.class</exclude>
                             <exclude>ru/job4j/StartUI.class</exclude>
+                            <exclude>ru/job4j/Abuse.class</exclude>
                         </excludes>
                     </instrumentation>
                     <check>
