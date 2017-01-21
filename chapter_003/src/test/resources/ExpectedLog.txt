@@ -1,0 +1,11 @@
+Bot: Bot speak
+User: q
+Bot: Bot speak
+User: pause
+User: a
+User: b
+User: continue
+Bot: Bot speak
+User: z
+Bot: Bot speak
+User: quit
