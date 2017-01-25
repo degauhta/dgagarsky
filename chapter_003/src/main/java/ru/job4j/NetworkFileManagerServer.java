@@ -1,5 +1,9 @@
 package ru.job4j;
 
+import java.io.IOException;
+import java.net.Socket;
+import java.util.Properties;
+
 /**
  * NetworkFileManagerServer class.
  *
@@ -13,7 +17,11 @@ public interface NetworkFileManagerServer {
     void run();
 
     /**
-     * Trying to execute received command.
+     * Execute received command.
+     *
+     * @param socket client socket.
+     * @param prop properties.
+     * @throws IOException .
      */
-    void executeCommand();
+    void executeCommand(Socket socket, Properties prop) throws IOException;
 }

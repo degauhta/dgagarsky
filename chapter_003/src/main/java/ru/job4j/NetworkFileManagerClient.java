@@ -1,5 +1,7 @@
 package ru.job4j;
 
+import java.io.IOException;
+
 /**
  * NetworkFileManagerClient class.
  *
@@ -14,23 +16,23 @@ public interface NetworkFileManagerClient {
     void run();
 
     /**
-     * Read ip & port from app.properties.
-     * Create socket & trying connect to the server.
-     */
-    void connectToServer();
-
-    /**
      * Save file from server.
+     *
+     * @throws IOException .
      */
-    void saveFile();
+    void saveFile() throws IOException;
 
     /**
      * Load file to server.
+     *
+     * @throws IOException .
      */
-    void loadFile();
+    void loadFile() throws IOException;
 
     /**
      * Print current catalogs.
+     *
+     * @throws IOException .
      */
-    void printCatalogs();
+    void printCatalogs() throws IOException;
 }

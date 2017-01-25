@@ -25,9 +25,13 @@ public class Abuse {
     public void dropAbuses(InputStream in, OutputStream out, String[] abuse) {
         try (BufferedReader bufReader = new BufferedReader(new InputStreamReader(in));
              BufferedWriter bufWriter = new BufferedWriter(new OutputStreamWriter(out))) {
+            StringBuilder regX = new StringBuilder();
+            for (String s : abuse) {
+                regX.append(s + "|");
+            }
             String line;
             while ((line = bufReader.readLine()) != null) {
-                line = line.replaceAll("one|two", "");
+                line = line.replaceAll(regX.toString(), "");
                 bufWriter.write(line);
             }
         } catch (IOException e) {

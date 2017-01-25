@@ -70,6 +70,9 @@ class Chat {
      * @throws IOException possible exception.
      */
     private void chat(RandomAccessFile randomAccessFile, Writer outFile, int count, long[] linePositions) throws IOException {
+        final String PAUSE = "pause";
+        final String CONTINUE = "continue";
+        final String QUIT = "quit";
         boolean botActive = true;
         String phrase;
         String userPhrase;
@@ -77,7 +80,7 @@ class Chat {
         do {
             if (botActive) {
                 randomAccessFile.seek(linePositions[random.nextInt(count)]);
-                phrase = "Bot: " + randomAccessFile.readLine();
+                phrase = String.format("Bot: %s", randomAccessFile.readLine());
                 System.out.println(phrase);
                 outFile.write(phrase);
                 outFile.write(System.getProperty("line.separator"));
@@ -85,15 +88,15 @@ class Chat {
 
             System.out.print("User: ");
             userPhrase = input.chat();
-            phrase = "User: " + userPhrase;
+            phrase = String.format("User: %s", userPhrase);
             outFile.write(phrase);
             outFile.write(System.getProperty("line.separator"));
 
-            if ("continue".equals(userPhrase)) {
+            if (CONTINUE.equals(userPhrase)) {
                 botActive = true;
-            } else if ("pause".equals(userPhrase)) {
+            } else if (PAUSE.equals(userPhrase)) {
                 botActive = false;
             }
-        } while (!"quit".equals(userPhrase));
+        } while (!QUIT.equals(userPhrase));
     }
 }
