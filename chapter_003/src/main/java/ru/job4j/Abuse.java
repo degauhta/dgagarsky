@@ -27,7 +27,8 @@ public class Abuse {
              BufferedWriter bufWriter = new BufferedWriter(new OutputStreamWriter(out))) {
             StringBuilder regX = new StringBuilder();
             for (String s : abuse) {
-                regX.append(s + "|");
+                regX.append(s);
+                regX.append("|");
             }
             String line;
             while ((line = bufReader.readLine()) != null) {
