@@ -1,19 +1,23 @@
 package ru.job4j;
 
-import org.apache.commons.io.IOUtils;
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.File;
+
 import java.net.Socket;
-import java.util.Properties;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
 
 /**
  * NetworkFileManagerServerImplTest class.
@@ -21,48 +25,213 @@ import static org.mockito.Mockito.*;
  * @author Denis
  * @since 29.01.2017
  */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(DataInputStream.class)
+//@RunWith(PowerMockRunner.class)
 public class NetworkFileManagerServerImplTest {
     /**
-     * Test.
+     * Sever.
      */
-    @Test
-    public void whenThen() throws IOException {
-        NetworkFileManagerServerImpl server = new NetworkFileManagerServerImpl();
-        //DataInputStream in = PowerMockito.mock(DataInputStream.class);
-        DataOutputStream out = Mockito.mock(DataOutputStream.class);
-        Properties prop = Mockito.mock(Properties.class);
-        Socket socket = Mockito.mock(Socket.class);
-        /**/
+    private NetworkFileManagerServerImpl server;
 
-//        final DataInputStream in = PowerMockito.mock(DataInputStream.class);
-//        PowerMockito.mockStatic(DataInputStream.class);
+    /**
+     * Socket.
+     */
+    private Socket socket;
 
-//        DataInputStream in = mock(DataInputStream.class);
-//        when(in.readUTF()).thenReturn("quit");
-//        Mockito.when(in.readUTF()).thenReturn("quit");
+    /**
+     * Current path.
+     */
+    private String currentPath;
 
-        DataInputStream in = PowerMockito.mock(DataInputStream.class);
-//        PowerMockito.mockStatic(DataInputStream.class);
-//        Mockito.doNothing().when(in).readUTF();
-
-
-        /**/
-        when(socket.getOutputStream()).thenReturn(out);
-        when(socket.getInputStream()).thenReturn(in);
-        when(prop.getProperty("currentDirectory")).thenReturn("c:\\");
-//        PowerMockito.when(in.read()).thenReturn(4);
-//        PowerMockito.when(in.readUTF()).thenReturn("quit");
-
-//        PowerMockito.when(in.readUTF()).thenThrow(new IOException("test"));
-
-        server.executeCommand(socket, prop);
-
-//        verify(socket).getOutputStream();
-//        verify(socket).getInputStream();
-//        verify(prop).getProperty("currentDirectory");
-//        verify(in).readUTF();
+    /**
+     * Init.
+     */
+    @Before
+    public void init() {
+        this.server = new NetworkFileManagerServerImpl();
+        this.socket = mock(Socket.class);
+        this.currentPath = getClass().getProtectionDomain().getCodeSource().getLocation().getPath().substring(1, 3) + "\\";
     }
 
+    /**
+     * Test input quit.
+     *
+     * @throws IOException io error.
+     */
+    @Test
+    public void whenInputQuitThenQuit() throws IOException {
+        DataOutputStream out = mock(DataOutputStream.class);
+        ByteArrayOutputStream array = new ByteArrayOutputStream();
+        DataOutputStream data = new DataOutputStream(array);
+        data.writeUTF("quit");
+        data.close();
+
+        when(this.socket.getInputStream()).thenReturn(new DataInputStream(new ByteArrayInputStream(array.toByteArray())));
+        when(this.socket.getOutputStream()).thenReturn(out);
+
+        this.server.executeCommand(this.socket);
+
+        verify(this.socket).getOutputStream();
+        verify(this.socket).getInputStream();
+    }
+
+    /**
+     * Test cd.
+     *
+     * @throws IOException io error.
+     */
+    @Test
+    public void whenInputCdThenGetNewDirectory() throws IOException {
+        ByteArrayOutputStream arrayOut = new ByteArrayOutputStream();
+        DataOutputStream out = new DataOutputStream(arrayOut);
+        ByteArrayOutputStream array = new ByteArrayOutputStream();
+        DataOutputStream data = new DataOutputStream(array);
+
+        File newDir;
+        do {
+            newDir = new File(this.currentPath + System.currentTimeMillis());
+        } while (newDir.exists());
+        newDir.mkdir();
+        data.writeUTF("cd " + newDir.getName());
+        data.writeUTF("quit");
+        data.close();
+
+        when(this.socket.getInputStream()).thenReturn(new DataInputStream(new ByteArrayInputStream(array.toByteArray())));
+        when(this.socket.getOutputStream()).thenReturn(out);
+
+        this.server.executeCommand(this.socket);
+
+        DataInputStream dis = new DataInputStream(new ByteArrayInputStream(arrayOut.toByteArray()));
+
+        assertThat(dis.readUTF(), is(this.currentPath));
+        assertThat(dis.readUTF(), is(this.currentPath + newDir.getName()));
+        assertThat(dis.readUTF(), is(this.currentPath + newDir.getName()));
+        newDir.delete();
+    }
+
+    /**
+     * Test dir.
+     *
+     * @throws IOException io error.
+     */
+    @Test
+    public void whenInputDirThenGetListOfDirectories() throws IOException {
+        ByteArrayOutputStream arrayOut = new ByteArrayOutputStream();
+        DataOutputStream out = new DataOutputStream(arrayOut);
+        ByteArrayOutputStream array = new ByteArrayOutputStream();
+        DataOutputStream data = new DataOutputStream(array);
+
+        File newDir;
+        do {
+            newDir = new File(this.currentPath + System.currentTimeMillis());
+        } while (newDir.exists());
+        newDir.mkdir();
+        File newSubDir;
+        do {
+            newSubDir = new File(newDir.toString() + "\\" + System.currentTimeMillis());
+        } while (newSubDir.exists());
+        newSubDir.mkdir();
+        data.writeUTF("cd " + newDir.getName());
+        data.writeUTF("dir");
+        data.writeUTF("quit");
+        data.close();
+
+        when(this.socket.getInputStream()).thenReturn(new DataInputStream(new ByteArrayInputStream(array.toByteArray())));
+        when(this.socket.getOutputStream()).thenReturn(out);
+
+        this.server.executeCommand(this.socket);
+
+        DataInputStream dis = new DataInputStream(new ByteArrayInputStream(arrayOut.toByteArray()));
+        assertThat(dis.readUTF(), is(this.currentPath));
+        assertThat(dis.readUTF(), is(newDir.getAbsolutePath()));
+        assertThat(dis.readUTF(), is(newSubDir.getAbsolutePath()));
+        assertThat(dis.readUTF(), is("endOfDir"));
+        assertThat(dis.readUTF(), is(newDir.getAbsolutePath()));
+        assertThat(dis.readUTF(), is(newDir.getAbsolutePath()));
+        newSubDir.delete();
+        newDir.delete();
+    }
+
+    /**
+     * Test load.
+     * @throws IOException io error.
+     */
+    @Test
+    public void whenInputLoadThenLoadFile() throws IOException {
+        ByteArrayOutputStream arrayOut = new ByteArrayOutputStream();
+        DataOutputStream out = new DataOutputStream(arrayOut);
+        ByteArrayOutputStream array = new ByteArrayOutputStream();
+        DataOutputStream data = new DataOutputStream(array);
+
+        data.writeUTF("load");
+
+        FileInputStream fileInStr;
+        File file = new File(getClass().getClassLoader().getResource("clientNetFileManTestFile.txt").getFile());
+        fileInStr = new FileInputStream(file);
+        data.writeLong(file.length());
+        byte[] buffer = new byte[(int) file.length()];
+        fileInStr.read(buffer, 0, buffer.length);
+        data.write(buffer);
+
+        data.writeUTF("quit");
+        data.close();
+
+        when(this.socket.getInputStream()).thenReturn(new DataInputStream(new ByteArrayInputStream(array.toByteArray())));
+        when(this.socket.getOutputStream()).thenReturn(out);
+
+        this.server.executeCommand(this.socket);
+
+        DataInputStream dis = new DataInputStream(new ByteArrayInputStream(arrayOut.toByteArray()));
+
+        assertThat(dis.readUTF(), is(this.currentPath));
+        assertThat(dis.readUTF(), is("loaded"));
+        assertThat(dis.readUTF(), is(this.currentPath));
+        assertThat(dis.readUTF(), is(this.currentPath));
+    }
+
+    /**
+     * Test dir.
+     *
+     * @throws IOException io error.
+     */
+    @Test
+    public void whenInputSaveThenSaveFile() throws IOException {
+        ByteArrayOutputStream arrayOut = new ByteArrayOutputStream();
+        DataOutputStream out = new DataOutputStream(arrayOut);
+        ByteArrayOutputStream array = new ByteArrayOutputStream();
+        DataOutputStream data = new DataOutputStream(array);
+
+        File newDir;
+        do {
+            newDir = new File(this.currentPath + System.currentTimeMillis());
+        } while (newDir.exists());
+        newDir.mkdir();
+        File newFile;
+        newFile = new File(newDir.toString() + "\\321.txt");
+        newFile.createNewFile();
+        data.writeUTF("save " + newFile.getAbsolutePath().substring(3, newFile.getAbsolutePath().length()));
+        data.writeUTF("quit");
+        data.close();
+
+        when(this.socket.getInputStream()).thenReturn(new DataInputStream(new ByteArrayInputStream(array.toByteArray())));
+        when(this.socket.getOutputStream()).thenReturn(out);
+
+        this.server.executeCommand(this.socket);
+
+        DataInputStream dis = new DataInputStream(new ByteArrayInputStream(arrayOut.toByteArray()));
+        assertThat(dis.readUTF(), is(this.currentPath));
+
+        assertThat(dis.readLong(), is(newFile.length()));
+        assertThat(dis.readUTF(), is(newFile.getName()));
+
+        byte[] buffer = new byte[(int) newFile.length()];
+        byte[] bufferNet = new byte[(int) newFile.length()];
+        FileInputStream fileInStr = new FileInputStream(newFile);
+        assertThat(dis.read(bufferNet, 0, buffer.length), is(fileInStr.read(buffer, 0, buffer.length)));
+
+        assertThat(dis.readUTF(), is(this.currentPath));
+        assertThat(dis.readUTF(), is(this.currentPath));
+
+        fileInStr.close();
+        dis.close();
+    }
 }

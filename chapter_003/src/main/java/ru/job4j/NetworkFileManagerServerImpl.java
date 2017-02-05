@@ -25,6 +25,9 @@ public class NetworkFileManagerServerImpl implements NetworkFileManagerServer {
      * Properties.
      */
     private Properties prop;
+    {
+        loadAppProperties();
+    }
 
     /**
      * Input socket stream.
@@ -41,17 +44,11 @@ public class NetworkFileManagerServerImpl implements NetworkFileManagerServer {
      */
     @Override
     public void run() {
-        Properties prop = loadAppProperties();
-        if (prop.getProperty("port") == null) {
-            System.out.println("app.properties not loaded");
-            return;
-        }
-
         try {
-            ServerSocket serverSocket = new ServerSocket(Integer.parseInt(prop.getProperty("port")));
+            ServerSocket serverSocket = new ServerSocket(Integer.parseInt(this.prop.getProperty("port")));
             while (true) {
                 Socket socket = serverSocket.accept();
-                executeCommand(socket, prop);
+                executeCommand(socket);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -62,20 +59,23 @@ public class NetworkFileManagerServerImpl implements NetworkFileManagerServer {
      * Execute received command.
      *
      * @param socket client socket.
-     * @param prop   properties.
      * @throws IOException .
      */
     @Override
-    public void executeCommand(Socket socket, Properties prop) throws IOException {
+    public void executeCommand(Socket socket) throws IOException {
+        if (this.prop.getProperty("port") == null) {
+            System.out.println("app.properties not loaded");
+        }
         in = new DataInputStream(socket.getInputStream());
         out = new DataOutputStream(socket.getOutputStream());
 
         String line = "";
-        out.writeUTF(prop.getProperty("currentDirectory"));
+        out.writeUTF(this.prop.getProperty("currentDirectory"));
         out.flush();
 
         while (!"quit".equals(line)) {
             try {
+                line = "";
                 do {
                     line = in.readUTF();
                     System.out.println("client: " + line);
@@ -100,9 +100,9 @@ public class NetworkFileManagerServerImpl implements NetworkFileManagerServer {
                 loadClientFile();
             }
 
-            line = "";
+            //line = "";
             /*current*/
-            out.writeUTF(prop.getProperty("currentDirectory"));
+            out.writeUTF(this.prop.getProperty("currentDirectory"));
             out.flush();
         }
     }
@@ -117,14 +117,16 @@ public class NetworkFileManagerServerImpl implements NetworkFileManagerServer {
         long fileSize = in.readLong();
         byte[] buffer = new byte[(int) fileSize];
 
-        fileOutStr = new FileOutputStream(prop.getProperty("currentDirectory") + "\\srv.txt");
+        fileOutStr = new FileOutputStream(this.prop.getProperty("currentDirectory") + "\\srv.txt");
         buffOutStr = new BufferedOutputStream(fileOutStr);
 
         in.read(buffer, 0, buffer.length);
         buffOutStr.write(buffer);
         buffOutStr.flush();
         System.out.println(fileSize);
-        System.out.println(prop.getProperty("Path") + "\\srv.txt");
+        System.out.println(this.prop.getProperty("currentDirectory") + "\\srv.txt");
+        out.writeUTF("loaded");
+        out.flush();
     }
 
     /**
@@ -134,7 +136,7 @@ public class NetworkFileManagerServerImpl implements NetworkFileManagerServer {
     private void sendDirToClient() throws IOException {
         System.out.println("sending dir");
 
-        String dir = prop.getProperty("currentDirectory");
+        String dir = this.prop.getProperty("currentDirectory");
         File myFile = new File(dir);
         File[] files = myFile.listFiles();
         System.out.println("all dir");
@@ -162,15 +164,18 @@ public class NetworkFileManagerServerImpl implements NetworkFileManagerServer {
     private void changeDirectory(String line) {
         File dir;
         if (line.endsWith("..")) {
-            dir = new File(prop.getProperty("currentDirectory"));
-            prop.setProperty("currentDirectory", dir.getParent());
+            dir = new File(this.prop.getProperty("currentDirectory"));
+            this.prop.setProperty("currentDirectory", dir.getParent());
         } else {
-            dir = new File(prop.getProperty("currentDirectory") + line.substring(3, line.length()));
+            String path = this.prop.getProperty("currentDirectory").endsWith("\\")
+                    ? this.prop.getProperty("currentDirectory")
+                    : this.prop.getProperty("currentDirectory") + "\\";
+            dir = new File(path + line.substring(3, line.length()));
             if (dir.isDirectory()) {
-                prop.setProperty("currentDirectory", dir.toString());
+                this.prop.setProperty("currentDirectory", dir.toString());
             }
         }
-        System.out.println(prop.getProperty("currentDirectory"));
+        System.out.println(this.prop.getProperty("currentDirectory"));
     }
 
     /**
@@ -181,7 +186,7 @@ public class NetworkFileManagerServerImpl implements NetworkFileManagerServer {
     private void saveToClient(String line) throws IOException {
         FileInputStream fileInStr;
         BufferedInputStream buffInStr;
-        File file = new File(prop.getProperty("currentDirectory")
+        File file = new File(this.prop.getProperty("currentDirectory")
                 + "\\" + line.substring(5, line.length()));
         if (file.isFile()) {
             System.out.println(file.toString());
@@ -195,27 +200,25 @@ public class NetworkFileManagerServerImpl implements NetworkFileManagerServer {
             buffInStr.read(buffer, 0, buffer.length);
             out.write(buffer);
             out.flush();
+            buffInStr.close();
         }
     }
 
     /**
      * Fill properties.
-     *
-     * @return properties.
      */
-    private Properties loadAppProperties() {
-        prop = new Properties();
+    private void loadAppProperties() {
+        this.prop = new Properties();
         File dir = new File(getClass().getProtectionDomain().getCodeSource().getLocation().getPath().substring(1, 4));
-        prop.setProperty("currentDirectory", dir.toString());
+        this.prop.setProperty("currentDirectory", dir.toString());
         ClassLoader classLoader = getClass().getClassLoader();
         try (InputStream inputStream = classLoader.getResourceAsStream("app.properties")) {
-            prop.load(inputStream);
+            this.prop.load(inputStream);
             File appProp = new File(classLoader.getResource("app.properties").getFile());
-            prop.setProperty("path", appProp.getParent());
+            this.prop.setProperty("path", appProp.getParent());
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return prop;
     }
 
     /**

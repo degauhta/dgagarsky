@@ -25,7 +25,7 @@ public class NetworkFileManagerClientImpl implements NetworkFileManagerClient {
     /**
      * Properties.
      */
-    private Properties prop;
+    private Properties prop = loadAppProperties();
 
     /**
      * Input socket stream.
@@ -50,44 +50,47 @@ public class NetworkFileManagerClientImpl implements NetworkFileManagerClient {
         System.out.println("load - load file to server");
         System.out.println("save 'name.extension' - save file from server");
         System.out.println();
-        prop = loadAppProperties();
-        if (prop.getProperty("port") == null) {
-            System.out.println("app.properties not loaded");
-            return;
-        }
-
         try (Socket socket = new Socket(prop.getProperty("server"),
                 Integer.parseInt(prop.getProperty("port")))) {
-            out = new DataOutputStream(socket.getOutputStream());
-            in = new DataInputStream(socket.getInputStream());
-
-            System.out.printf("%s> ", in.readUTF());
-            Scanner scanner = new Scanner(System.in);
-            String command;
-
-            do {
-                command = scanner.nextLine();
-                out.writeUTF(command);
-                out.flush();
-
-                if ("dir".equals(command)) {
-                    printCatalogs();
-                }
-
-                if ("load".equals(command)) {
-                    loadFile();
-                }
-
-                if (command.length() > 5 && "save ".equals(command.substring(0, 5))) {
-                    saveFile();
-                }
-
-                System.out.printf("%s> ", in.readUTF());
-            } while (!"quit".equals(command));
-
+            executeCommand(socket, System.in);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Execute commands from console.
+     * @param socket server socket.
+     * @param scannerStream input stream for scanner.
+     * @throws IOException io error.
+     */
+    public void executeCommand(Socket socket, InputStream scannerStream) throws IOException {
+        out = new DataOutputStream(socket.getOutputStream());
+        in = new DataInputStream(socket.getInputStream());
+
+        System.out.printf("%s> ", in.readUTF());
+        Scanner scanner = new Scanner(scannerStream);
+        String command;
+
+        do {
+            command = scanner.nextLine();
+            out.writeUTF(command);
+            out.flush();
+
+            if ("dir".equals(command)) {
+                printCatalogs();
+            }
+
+            if ("load".equals(command)) {
+                loadFile();
+            }
+
+            if (command.length() > 5 && "save ".equals(command.substring(0, 5))) {
+                saveFile();
+            }
+
+            System.out.printf("%s> ", in.readUTF());
+        } while (!"quit".equals(command));
     }
 
     /**
@@ -129,6 +132,7 @@ public class NetworkFileManagerClientImpl implements NetworkFileManagerClient {
         buffInStr.read(buffer, 0, buffer.length);
         out.write(buffer);
         out.flush();
+        System.out.println(in.readUTF());
     }
 
     /**
