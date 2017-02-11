@@ -34,6 +34,11 @@ public class InteractCalcTest {
     private MenuCalculator menuCalculator;
 
     /**
+     * Menu size.
+     */
+    private static final int MENU_SIZE = 4;
+
+    /**
      * Initialization.
      */
     @Before
@@ -48,7 +53,7 @@ public class InteractCalcTest {
     public void whenAdditionOneAndTwoThenReturnThree() {
         this.answers = new String[] {"0", "1", "2", "", "0", "1", "2", "y"};
         this.input = new StubInputCalc(answers);
-        this.menuCalculator = new MenuCalculator(this.input, this.calculator, InteractCalc.MENU_SIZE);
+        this.menuCalculator = new MenuCalculator(this.input, this.calculator, MENU_SIZE);
         int[] menuRange = this.menuCalculator.fillAction();
         new InteractCalc(this.input, this.menuCalculator, menuRange).init();
         assertThat(this.calculator.getResult(), is(3.0));
@@ -61,7 +66,7 @@ public class InteractCalcTest {
     public void whenSubtractThreeAndOneThenReturnTwo() {
         this.answers = new String[] {"1", "3", "1", "y"};
         this.input = new StubInputCalc(this.answers);
-        this.menuCalculator = new MenuCalculator(this.input, this.calculator, InteractCalc.MENU_SIZE);
+        this.menuCalculator = new MenuCalculator(this.input, this.calculator, MENU_SIZE);
         int[] menuRange = this.menuCalculator.fillAction();
         new InteractCalc(this.input, this.menuCalculator, menuRange).init();
         assertThat(this.calculator.getResult(), is(2.0));
@@ -74,7 +79,7 @@ public class InteractCalcTest {
     public void whenMultiplyThreeAndOneThenReturnThree() {
         this.answers = new String[] {"2", "3", "1", "y"};
         this.input = new StubInputCalc(this.answers);
-        this.menuCalculator = new MenuCalculator(this.input, this.calculator, InteractCalc.MENU_SIZE);
+        this.menuCalculator = new MenuCalculator(this.input, this.calculator, MENU_SIZE);
         int[] menuRange = this.menuCalculator.fillAction();
         new InteractCalc(this.input, this.menuCalculator, menuRange).init();
         assertThat(this.calculator.getResult(), is(3.0));
@@ -87,7 +92,7 @@ public class InteractCalcTest {
     public void whenDivideSixByTwoThenReturnTwo() {
         this.answers = new String[] {"3", "6", "2", "y"};
         this.input = new StubInputCalc(this.answers);
-        this.menuCalculator = new MenuCalculator(this.input, this.calculator, InteractCalc.MENU_SIZE);
+        this.menuCalculator = new MenuCalculator(this.input, this.calculator, MENU_SIZE);
         int[] menuRange = this.menuCalculator.fillAction();
         new InteractCalc(this.input, this.menuCalculator, menuRange).init();
         assertThat(this.calculator.getResult(), is(3.0));

@@ -25,7 +25,7 @@ public class InteractCalc {
     /**
      * Menu size.
      */
-    static final int MENU_SIZE = 4;
+    static final int MENU_SIZE = 6;
 
     /**
      * Constructor.
@@ -55,8 +55,8 @@ public class InteractCalc {
      */
     public static void main(String[] args) {
         InputCalc input = new ValidateInputCalc();
-        Calculator calculator = new Calculator();
-        MenuCalculator menuCalculator = new MenuCalculator(input, calculator, MENU_SIZE);
+        CalculatorTrigonometric calculator = new CalculatorTrigonometric();
+        MenuCalculator menuCalculator = new MenuCalculatorTrigonometric(input, calculator, MENU_SIZE);
         int[] menuRange = menuCalculator.fillAction();
         new InteractCalc(input, menuCalculator, menuRange).init();
     }
