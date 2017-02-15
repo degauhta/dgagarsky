@@ -6,7 +6,7 @@ package ru.job4j;
  * @author Denis
  * @since 12.02.2017
  */
-public class Shop implements StorageI {
+public class Shop implements Storage {
     /**
      * Food.
      */

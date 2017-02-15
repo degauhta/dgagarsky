@@ -21,7 +21,7 @@ public class WarehouseTest {
      */
     @Test
     public void whenAddOneFruitThenOneFruitInWarehouse() {
-        StorageI storage = new Warehouse(10);
+        Storage storage = new Warehouse(10);
         Food apple0 = new Fruit("apple0", System.currentTimeMillis() - 1000,
                 System.currentTimeMillis() + 1000 * 10, 100, 0);
         ControlQuality controlQuality = new ControlQuality(storage);
@@ -34,7 +34,7 @@ public class WarehouseTest {
      */
     @Test
     public void whenRemoveFruitThenReturnRemainedInWarehouse() {
-        StorageI storage = new Warehouse(10);
+        Storage storage = new Warehouse(10);
         Food apple0 = new Fruit("apple0", System.currentTimeMillis() - 1000,
                 System.currentTimeMillis() + 1000 * 10, 100, 0);
         Food apple1 = new Fruit("apple1", System.currentTimeMillis() - 1000,
@@ -58,7 +58,7 @@ public class WarehouseTest {
      */
     @Test
     public void whenAddFruitInFullWarehouseThenReturnMessage() {
-        StorageI storage = new Warehouse(1);
+        Storage storage = new Warehouse(1);
         Food apple0 = new Fruit("apple0", System.currentTimeMillis() - 1000,
                 System.currentTimeMillis() + 1000 * 10, 100, 0);
         Food apple1 = new Fruit("apple1", System.currentTimeMillis() - 1000,
@@ -79,6 +79,11 @@ public class WarehouseTest {
     public void testGetAndSet() {
         Food apple = new Fruit("apple0", System.currentTimeMillis() - 1000,
                 System.currentTimeMillis() + 1000 * 10, 100, 0);
+        Food meat = new Meat("meat", System.currentTimeMillis() - 1000,
+                System.currentTimeMillis() + 1000 * 10, 100, 0);
+        Food vegetable = new Vegetable("vegetable", System.currentTimeMillis() - 1000,
+                System.currentTimeMillis() + 1000 * 10, 100, 0);
+
         apple.setName("fruit");
         assertThat(apple.getName(), is("fruit"));
         apple.setPrice(330);
@@ -87,7 +92,24 @@ public class WarehouseTest {
         assertThat(apple.getCreateDate(), is(123L));
         apple.setExpireDate(567);
         assertThat(apple.getExpireDate(), is(567L));
-    }
 
+        meat.setName("meat");
+        assertThat(meat.getName(), is("meat"));
+        meat.setPrice(330);
+        assertThat(meat.getPrice(), is(330.0));
+        meat.setCreateDate(123);
+        assertThat(meat.getCreateDate(), is(123L));
+        meat.setExpireDate(567);
+        assertThat(meat.getExpireDate(), is(567L));
+
+        vegetable.setName("vegetable");
+        assertThat(vegetable.getName(), is("vegetable"));
+        vegetable.setPrice(330);
+        assertThat(vegetable.getPrice(), is(330.0));
+        vegetable.setCreateDate(123);
+        assertThat(vegetable.getCreateDate(), is(123L));
+        vegetable.setExpireDate(567);
+        assertThat(vegetable.getExpireDate(), is(567L));
+    }
 
 }

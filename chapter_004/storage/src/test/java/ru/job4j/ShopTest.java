@@ -7,6 +7,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -21,7 +22,7 @@ public class ShopTest {
      */
     @Test
     public void whenAddOneVegetableThenOneVegetableInWarehouse() {
-        StorageI storage = new Shop(10);
+        Storage storage = new Shop(10);
         Food vegetable0 = new Vegetable("vegetable0", System.currentTimeMillis() - 1000,
                 System.currentTimeMillis() + 1000 * 2, 100, 0);
         ControlQuality controlQuality = new ControlQuality(storage);
@@ -34,7 +35,7 @@ public class ShopTest {
      */
     @Test
     public void whenRemoveVegetableThenReturnRemainedInWarehouse() {
-        StorageI storage = new Shop(10);
+        Storage storage = new Shop(10);
         Food vegetable0 = new Vegetable("vegetable0", System.currentTimeMillis() - 1000,
                 System.currentTimeMillis() + 1000 * 2, 100, 0);
         Food vegetable1 = new Vegetable("vegetable1", System.currentTimeMillis() - 1000,
@@ -58,7 +59,7 @@ public class ShopTest {
      */
     @Test
     public void whenAddVegetableInFullShopThenReturnMessage() {
-        StorageI storage = new Shop(1);
+        Storage storage = new Shop(1);
         Food vegetable0 = new Vegetable("vegetable0", System.currentTimeMillis() - 1000,
                 System.currentTimeMillis() + 1000 * 2, 100, 0);
         Food vegetable1 = new Vegetable("vegetable1", System.currentTimeMillis() - 1000,
@@ -76,7 +77,7 @@ public class ShopTest {
      */
     @Test
     public void whenVegetableIsOldThenSetDiscount() {
-        StorageI storage = new Shop(10);
+        Storage storage = new Shop(10);
         Food vegetable0 = new Vegetable("vegetable0", System.currentTimeMillis() - 1000,
                 System.currentTimeMillis() + 200, 100, 0);
         ControlQuality controlQuality = new ControlQuality(storage);
@@ -84,4 +85,25 @@ public class ShopTest {
         assertThat(vegetable0.getDiscount(), is(0.5));
         assertThat(vegetable0.getPriceWithDiscount(), is(50.0));
     }
+
+    /**
+     * Remove vegetable.
+     *
+     * @throws InterruptedException InterruptedException error.
+     */
+    @Test
+    public void whenVegetableIsOldThenItGoesInTrash() throws InterruptedException {
+        Storage shop = new Shop(10);
+        Storage trash = new Trash(10);
+        Food vegetable0 = new Vegetable("vegetable0", System.currentTimeMillis() - 100,
+                System.currentTimeMillis() + 50, 100, 0);
+        ControlQuality controlQuality = new ControlQuality(shop, trash);
+        controlQuality.distributeOnStorage(vegetable0);
+        assertThat(shop.getFoods()[0], is(vegetable0));
+        Thread.sleep(100);
+        controlQuality.distributeOnStorage(shop.getFoods());
+        assertThat(shop.getFoods()[0], is(nullValue()));
+        assertThat(trash.getFoods()[0], is(vegetable0));
+    }
+
 }

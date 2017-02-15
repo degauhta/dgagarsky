@@ -10,14 +10,14 @@ public class ControlQuality {
     /**
      * Storages Array.
      */
-    private StorageI[] storageArray;
+    private Storage[] storageArray;
 
     /**
      * Default constructor.
      *
      * @param storageArray storageArray.
      */
-    public ControlQuality(StorageI ... storageArray) {
+    public ControlQuality(Storage... storageArray) {
         this.storageArray = storageArray;
     }
 
@@ -26,12 +26,15 @@ public class ControlQuality {
      *
      * @param foods foods.
      */
-    public void distributeOnStorage(Food ... foods) {
+    public void distributeOnStorage(Food... foods) {
         for (Food food : foods) {
-            for (StorageI storage: this.storageArray) {
-                if (storage.addFood(food)) {
+            for (Storage storage : this.storageArray) {
+                if (food == null || storage == null) {
+                    break;
+                } else if (storage.addFood(food)) {
                     break;
                 }
+                storage.removeFood(food);
             }
         }
     }

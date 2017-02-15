@@ -6,155 +6,89 @@ package ru.job4j;
  * @author Denis
  * @since 12.02.2017
  */
-public class Food {
-    /**
-     * Name of the food.
-     */
-    private String name;
-
-    /**
-     * Date of create.
-     */
-    private long createDate;
-
-    /**
-     * Expires date.
-     */
-    private long expireDate;
-
-    /**
-     * Price.
-     */
-    private double price;
-
-    /**
-     * Discount percent.
-     */
-    private double discount;
-
-    /**
-     * Default constructor.
-     *
-     * @param name       name.
-     * @param createDate create date.
-     * @param expireDate expire date.
-     * @param price      price.
-     * @param discount   discount.
-     */
-    public Food(final String name, final long createDate, final long expireDate, double price, double discount) {
-        this.name = name;
-        this.createDate = createDate;
-        this.expireDate = expireDate;
-        this.price = price;
-        this.discount = discount;
-    }
-
+public abstract class Food {
     /**
      * Get freshness of food.
      *
      * @param currentDate current time.
      * @return freshness of food.
      */
-    public double getFreshness(double currentDate) {
-        return (currentDate - this.createDate) / (this.expireDate - this.createDate);
-    }
+    public abstract double getFreshness(double currentDate);
 
     /**
      * Get food name.
      *
      * @return name.
      */
-    public String getName() {
-        return this.name;
-    }
+    public abstract String getName();
 
     /**
      * Get date of creation.
      *
      * @return date of creation.
      */
-    public long getCreateDate() {
-        return this.createDate;
-    }
+    public abstract long getCreateDate();
 
     /**
      * Get date of expire.
      *
      * @return expires date.
      */
-    public long getExpireDate() {
-        return this.expireDate;
-    }
+    public abstract long getExpireDate();
 
     /**
      * Get price without discount..
      *
      * @return price.
      */
-    public double getPrice() {
-        return this.price;
-    }
+    public abstract double getPrice();
 
     /**
      * Get price with discount.
      *
      * @return price with discount.
      */
-    public double getPriceWithDiscount() {
-        return this.price - this.price * this.discount;
-    }
+    public abstract double getPriceWithDiscount();
 
     /**
      * Get discount percent.
      *
      * @return discount.
      */
-    public double getDiscount() {
-        return this.discount;
-    }
+    public abstract double getDiscount();
 
     /**
      * Set name of food.
      *
      * @param name name.
      */
-    public void setName(String name) {
-        this.name = name;
-    }
+    public abstract void setName(String name);
 
     /**
      * Set food price.
      *
      * @param price price.
      */
-    public void setPrice(double price) {
-        this.price = price;
-    }
+    public abstract void setPrice(double price);
 
     /**
      * Set create date.
      *
      * @param createDate createDate.
      */
-    public void setCreateDate(long createDate) {
-        this.createDate = createDate;
-    }
+    public abstract void setCreateDate(long createDate);
 
     /**
      * Set expire date.
      *
      * @param expireDate expireDate.
      */
-    public void setExpireDate(long expireDate) {
-        this.expireDate = expireDate;
-    }
+    public abstract void setExpireDate(long expireDate);
 
     /**
      * Det discount percent.
      *
      * @param discount discount.
      */
-    public void setDiscount(double discount) {
-        this.discount = discount;
-    }
+    public abstract void setDiscount(double discount);
 }

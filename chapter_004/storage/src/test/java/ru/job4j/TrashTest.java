@@ -21,7 +21,7 @@ public class TrashTest {
      */
     @Test
     public void whenAddOneMeatThenOneMeatInTrash() {
-        StorageI storage = new Trash(10);
+        Storage storage = new Trash(10);
         Food meat0 = new Meat("meat0", System.currentTimeMillis() - 1000,
                 System.currentTimeMillis(), 100, 0);
         ControlQuality controlQuality = new ControlQuality(storage);
@@ -34,7 +34,7 @@ public class TrashTest {
      */
     @Test
     public void whenRemoveMeatThenReturnFalse() {
-        StorageI storage = new Trash(10);
+        Storage storage = new Trash(10);
         Food meat0 = new Meat("meat0", System.currentTimeMillis() - 1000,
                 System.currentTimeMillis(), 100, 0);
         ControlQuality controlQuality = new ControlQuality(storage);
@@ -47,7 +47,7 @@ public class TrashTest {
      */
     @Test
     public void whenAddMeatInFullTrashThenReturnMessage() {
-        StorageI storage = new Trash(1);
+        Storage storage = new Trash(1);
         Food meat0 = new Meat("meat0", System.currentTimeMillis() - 1000,
                 System.currentTimeMillis(), 100, 0);
         Food meat1 = new Meat("meat1", System.currentTimeMillis() - 1000,

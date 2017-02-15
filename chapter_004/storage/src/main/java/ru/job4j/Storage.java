@@ -1,12 +1,12 @@
 package ru.job4j;
 
 /**
- * StorageI class.
+ * Storage class.
  *
  * @author Denis
  * @since 13.02.2017
  */
-public interface StorageI {
+public interface Storage {
     /**
      * Add food.
      *
