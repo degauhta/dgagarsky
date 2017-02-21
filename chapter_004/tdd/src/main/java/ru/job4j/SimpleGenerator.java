@@ -1,5 +1,6 @@
 package ru.job4j;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -12,6 +13,11 @@ import java.util.regex.Pattern;
  */
 public class SimpleGenerator implements Template {
     /**
+     * Pattern.
+     */
+    private static final Pattern PATTERN = Pattern.compile("\\$\\{(.+?)}");
+
+    /**
      * Hello world, ${name}.
      *
      * @param template template.
@@ -20,24 +26,25 @@ public class SimpleGenerator implements Template {
      */
     @Override
     public String generate(String template, Map<String, String> data) {
-        Pattern pattern = Pattern.compile("\\$\\{(.+?)}");
-        Matcher matcher = pattern.matcher(template);
-        String result = template;
+        Matcher matcher = PATTERN.matcher(template);
+        StringBuffer sb = new StringBuffer(template.length());
         String value;
+        String key;
+        Map<String, String> delete = new HashMap<>();
         while (matcher.find()) {
-            value = data.get(matcher.group(1));
+            key = matcher.group(1);
+            value = data.get(key);
             if (value == null) {
                 throw new TemplateException("There are no such key in data.");
             } else {
-                result = result.replaceAll(String.format("\\$\\{%s}", matcher.group(1)), value);
+                matcher.appendReplacement(sb, Matcher.quoteReplacement(value));
+                delete.put(key, value);
             }
-            data.remove(matcher.group(1));
-            matcher = pattern.matcher(result);
         }
-        if (data.size() > 0) {
+        matcher.appendTail(sb);
+        if (data.size() != delete.size()) {
             throw new TemplateException("Not all keys have been used.");
         }
-        System.out.println(result);
-        return result;
+        return sb.toString();
     }
 }

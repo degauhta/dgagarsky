@@ -1,6 +1,7 @@
 package ru.job4j;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Control quality class.
@@ -48,19 +49,18 @@ public class ControlQuality {
         if (storageArray.length == 0) {
             return;
         }
-        Food[] allFoods = new Food[storageArray[0].getFoods().length];
-        System.arraycopy(storageArray[0].getFoods(), 0, allFoods, 0,
-                storageArray[0].getFoods().length);
-        int currentLength;
-        removeFoodFromStorage(storageArray[0]);
-        for (int i = 1; i < storageArray.length; i++) {
-            currentLength = allFoods.length;
-            allFoods = Arrays.copyOf(allFoods, currentLength + storageArray[i].getFoods().length);
-            System.arraycopy(storageArray[i].getFoods(), 0, allFoods, currentLength,
-                    storageArray[i].getFoods().length);
+        List<Food> list = new ArrayList<>();
+        for (int i = 0; i < storageArray.length; i++) {
+            for (Food food: storageArray[i].getFoods()) {
+                if (food != null) {
+                    list.add(food);
+                }
+            }
             removeFoodFromStorage(storageArray[i]);
         }
-        distributeOnStorage(allFoods);
+        Food[] foods = new Food[list.size()];
+        foods = list.toArray(foods);
+        distributeOnStorage(foods);
     }
 
     /**
