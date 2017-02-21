@@ -15,6 +15,7 @@
         <module>storage</module>
         <module>isp</module>
         <module>tdd</module>
+        <module>tictactoe</module>
     </modules>
 
     <dependencies>
