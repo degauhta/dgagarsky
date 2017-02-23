@@ -16,6 +16,7 @@
         <module>isp</module>
         <module>tdd</module>
         <module>tictactoe</module>
+        <module>island</module>
     </modules>
 
     <dependencies>
