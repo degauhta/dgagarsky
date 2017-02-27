@@ -17,8 +17,8 @@ public class RoleStoreTest {
      */
     @Test
     public void whenSuccessfullyAddedRoleInCollectionThenReturnTrue() {
-        Store<Base> store = new RoleStore<>(10);
-        Base role = new Role("Admin", "1");
+        Store<Role> store = new RoleStore(10);
+        Role role = new Role("Admin", "1");
 
         boolean actual = store.add(role);
 
@@ -30,9 +30,9 @@ public class RoleStoreTest {
      */
     @Test
     public void whenSuccessfullyRemoveRoleFromCollectionThenReturnTrue() {
-        Store<Base> store = new RoleStore<>(10);
-        Base role = new Role("Admin", "1");
-        Base role1 = new Role("Guest", "2");
+        Store<Role> store = new RoleStore(10);
+        Role role = new Role("Admin", "1");
+        Role role1 = new Role("Guest", "2");
 
         store.add(role);
         store.add(role1);
@@ -46,9 +46,9 @@ public class RoleStoreTest {
      */
     @Test
     public void whenSuccessfullyUpdateRoleInCollectionThenReturnOldUser() {
-        Store<Base> store = new RoleStore<>(10);
-        Base role = new Role("Admin", "1");
-        Base role1 = new Role("Guest", "2");
+        Store<Role> store = new RoleStore(10);
+        Role role = new Role("Admin", "1");
+        Role role1 = new Role("Guest", "2");
 
         store.add(role);
         Base actual = store.update(role1, "1");

@@ -3,11 +3,10 @@ package ru.job4j;
 /**
  * UserStore class.
  *
- * @param <T> type
  * @author Denis
  * @since 26.02.2017
  */
-public class UserStore<T extends Base> extends AbstractStore<T> {
+public class UserStore extends AbstractStore<User> {
     /**
      * Main constructor.
      *

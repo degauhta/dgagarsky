@@ -17,8 +17,8 @@ public class UserStoreTest {
      */
     @Test
     public void whenSuccessfullyAddedUserInCollectionThenReturnTrue() {
-        Store<Base> store = new UserStore<>(10);
-        Base user = new User("Denis", "1");
+        Store<User> store = new UserStore(10);
+        User user = new User("Denis", "1");
 
         boolean actual = store.add(user);
 
@@ -30,9 +30,9 @@ public class UserStoreTest {
      */
     @Test
     public void whenSuccessfullyRemoveUserFromCollectionThenReturnTrue() {
-        Store<Base> store = new UserStore<>(10);
-        Base user = new User("Denis1", "1");
-        Base user2 = new User("Denis2", "2");
+        Store<User> store = new UserStore(10);
+        User user = new User("Denis1", "1");
+        User user2 = new User("Denis2", "2");
 
         store.add(user);
         store.add(user2);
@@ -46,9 +46,9 @@ public class UserStoreTest {
      */
     @Test
     public void whenSuccessfullyUpdateUserInCollectionThenReturnOldUser() {
-        Store<Base> store = new UserStore<>(10);
-        Base user = new User("Denis1", "1");
-        Base user2 = new User("Denis2", "2");
+        Store<User> store = new UserStore(10);
+        User user = new User("Denis1", "1");
+        User user2 = new User("Denis2", "2");
 
         store.add(user);
         Base actual = store.update(user2, "1");
