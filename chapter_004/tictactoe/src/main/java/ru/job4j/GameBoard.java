@@ -31,6 +31,16 @@ public class GameBoard implements Board {
     private final int size;
 
     /**
+     * Last move column.
+     */
+    private int lastMoveColumn;
+
+    /**
+     * Last move row.
+     */
+    private int lastMoveRow;
+
+    /**
      * Main constructor.
      *
      * @param size board size.
@@ -67,6 +77,8 @@ public class GameBoard implements Board {
         if (this.cells[row][column] == '\u0000') {
             this.cells[row][column] = sign;
             result = true;
+            this.lastMoveColumn = column;
+            this.lastMoveRow = row;
         }
         return result;
     }
@@ -105,53 +117,27 @@ public class GameBoard implements Board {
      * @return true if game is over.
      */
     public boolean isGameOver(char sign) {
-        boolean result = false;
-        int countRow = 0;
-        int countCol = 0;
+        int col = 0;
+        int row = 0;
+        int diagonalDown = 0;
+        int diagonalUp = 0;
+
         for (int i = 0; i < this.size; i++) {
-            for (int j = 0; j < this.size; j++) {
-                if (cells[i][j] == sign) {
-                    countRow++;
-                } else {
-                    countRow = 0;
-                }
-                if (cells[j][i] == sign) {
-                    countCol++;
-                } else {
-                    countCol = 0;
-                }
+            if (cells[this.lastMoveRow][i] == sign) {
+                col++;
             }
-            if (countCol == this.size || countRow == this.size) {
-                result = true;
-                break;
+            if (cells[i][this.lastMoveColumn] == sign) {
+                row++;
+            }
+            if (cells[i][i] == sign) {
+                diagonalDown++;
+            }
+            if (cells[i][this.size - i - 1] == sign) {
+                diagonalUp++;
             }
         }
-        int countDiagonal = 0;
-        if (!result) {
-            int j = 0;
-            for (int i = 0; i < this.size; i++) {
-                if (cells[i][j] == sign) {
-                    countDiagonal++;
-                } else {
-                    countDiagonal = 0;
-                }
-                j++;
-            }
-        }
-        result = result || countDiagonal == this.size;
-        if (!result) {
-            countDiagonal = 0;
-            int j = 0;
-            for (int i = this.size - 1; i >= 0; i--) {
-                if (cells[i][j] == sign) {
-                    countDiagonal++;
-                } else {
-                    countDiagonal = 0;
-                }
-                j++;
-            }
-        }
-        return result || countDiagonal == this.size;
+
+        return row == this.size || col == this.size || diagonalDown == this.size || diagonalUp == this.size;
     }
 
     /**
