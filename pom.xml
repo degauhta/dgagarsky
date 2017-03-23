@@ -18,6 +18,7 @@
         <module>chapter_003</module>
         <module>chapter_004</module>
         <module>chapter_005</module>
+        <module>chapter_006</module>
     </modules>
 	
 	<dependencies>
@@ -77,6 +78,7 @@
                             <exclude>ru/job4j/start/MenuTracker$ShowItems.class</exclude>
                             <exclude>ru/job4j/StartUI.class</exclude>
                             <exclude>ru/job4j/Abuse.class</exclude>
+                            <exclude>ru/job4j/User.class</exclude>
                         </excludes>
                     </instrumentation>
                     <check>
