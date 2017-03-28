@@ -79,6 +79,7 @@
                             <exclude>ru/job4j/StartUI.class</exclude>
                             <exclude>ru/job4j/Abuse.class</exclude>
                             <exclude>ru/job4j/User.class</exclude>
+                            <exclude>ru/job4j/Cache.class</exclude>
                         </excludes>
                     </instrumentation>
                     <check>
