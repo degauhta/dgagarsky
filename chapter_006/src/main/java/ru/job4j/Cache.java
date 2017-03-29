@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.ref.SoftReference;
-import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,33 +15,34 @@ import java.util.Map;
  */
 class Cache {
     /**
-     * Map with weak reference.
-     */
-    private Map<String, WeakReference<String>> weakMap;
-
-    /**
      * Map with soft reference.
      */
     private Map<String, SoftReference<String>> softMap;
 
     /**
+     * Cache flag.
+     */
+    private boolean cacheFilled;
+
+    /**
      * Default constructor.
      */
     Cache() {
-        this.weakMap = new HashMap<>();
         this.softMap = new HashMap<>();
+        this.cacheFilled = false;
     }
 
     /**
-     * Fill cache with file data.
+     * Read file if it not in cache.
+     * If it already in cache then return data from cache.
      *
      * @param fileName file name
-     * @return true if data is write in cache, false if data is already in cache
+     * @return file data
      */
-    boolean fillCache(String fileName) {
-        boolean result = false;
+    String readFile(String fileName) {
+        this.cacheFilled = false;
+        StringBuilder sb = new StringBuilder();
         if (this.softMap.get(fileName) == null || this.softMap.get(fileName).get() == null) {
-            StringBuilder sb = new StringBuilder();
             try (FileReader fileReader = new FileReader(fileName);
                  BufferedReader bufferedReader = new BufferedReader(fileReader)) {
                 String sCurrentLine;
@@ -52,30 +52,18 @@ class Cache {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            this.weakMap.put(fileName, new WeakReference<>(sb.toString()));
             this.softMap.put(fileName, new SoftReference<>(sb.toString()));
-            result = true;
+            this.cacheFilled = true;
         }
-        return result;
+        return sb.length() == 0 ? this.softMap.get(fileName).get() : sb.toString();
     }
 
     /**
-     * Get weak map data.
+     * Get cache filled flag.
      *
-     * @param fileName file name
-     * @return value
+     * @return true if last file was read from cache
      */
-    String getWeakMap(String fileName) {
-        return this.weakMap.get(fileName).get();
-    }
-
-    /**
-     * Get soft map data.
-     *
-     * @param fileName file name
-     * @return value
-     */
-    String getSoftMap(String fileName) {
-        return this.softMap.get(fileName).get();
+    boolean isCacheFilled() {
+        return this.cacheFilled;
     }
 }

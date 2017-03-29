@@ -6,7 +6,6 @@ import org.junit.Test;
 import java.io.File;
 
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -27,6 +26,11 @@ public class CacheTest {
     private String namesPath;
 
     /**
+     * Data from file Names.
+     */
+    private String sNames;
+
+    /**
      * Init.
      */
     @Before
@@ -35,6 +39,11 @@ public class CacheTest {
         File source = new File(classLoader.getResource("Names.txt").getFile());
         this.namesPath = source.getPath();
         this.cache = new Cache();
+        StringBuilder sbNames = new StringBuilder();
+        for (int i = 0; i < 10; i++) {
+            sbNames.append(String.format("%s%s%s", "Name", i, System.lineSeparator()));
+        }
+        this.sNames = sbNames.toString();
     }
 
     /**
@@ -42,7 +51,8 @@ public class CacheTest {
      */
     @Test
     public void whenReadFileOnceThenReturnTrue() {
-        assertThat(this.cache.fillCache(this.namesPath), is(true));
+        assertThat(this.cache.readFile(this.namesPath), is(this.sNames));
+        assertThat(this.cache.isCacheFilled(), is(true));
     }
 
     /**
@@ -50,22 +60,8 @@ public class CacheTest {
      */
     @Test
     public void whenReadFileTwiceThenReturnFalse() {
-        this.cache.fillCache(this.namesPath);
-        assertThat(this.cache.fillCache(this.namesPath), is(false));
-    }
-
-    /**
-     * Test weal reference after GC work.
-     */
-    @Test
-    public void whenGCInvokeThenWeakReferenceIsNullAndSoftHaveData() {
-        cache.fillCache(namesPath);
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < 10; i++) {
-            sb.append(String.format("%s%s%s", "Name", i, System.lineSeparator()));
-        }
-        System.gc();
-        assertThat(this.cache.getSoftMap(this.namesPath), is(sb.toString()));
-        assertThat(this.cache.getWeakMap(this.namesPath), is(nullValue()));
+        this.cache.readFile(this.namesPath);
+        assertThat(this.cache.readFile(this.namesPath), is(this.sNames));
+        assertThat(this.cache.isCacheFilled(), is(false));
     }
 }
