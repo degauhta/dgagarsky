@@ -51,7 +51,7 @@ public class CacheTest {
      */
     @Test
     public void whenReadFileOnceThenReturnTrue() {
-        assertThat(this.cache.readFile(this.namesPath), is(this.sNames));
+        assertThat(this.cache.get(this.namesPath), is(this.sNames));
         assertThat(this.cache.isCacheFilled(), is(true));
     }
 
@@ -60,8 +60,8 @@ public class CacheTest {
      */
     @Test
     public void whenReadFileTwiceThenReturnFalse() {
-        this.cache.readFile(this.namesPath);
-        assertThat(this.cache.readFile(this.namesPath), is(this.sNames));
+        this.cache.get(this.namesPath);
+        assertThat(this.cache.get(this.namesPath), is(this.sNames));
         assertThat(this.cache.isCacheFilled(), is(false));
     }
 }
