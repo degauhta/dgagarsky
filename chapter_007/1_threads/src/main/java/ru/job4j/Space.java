@@ -1,5 +1,7 @@
 package ru.job4j;
 
+import java.util.StringTokenizer;
+
 /**
  * Space class.
  *
@@ -18,15 +20,57 @@ class Space {
     private int spaces;
 
     /**
+     * Thread words.
+     */
+    private Thread threadWords;
+
+    /**
+     * Thread spaces.
+     */
+    private Thread threadSpaces;
+
+    /**
      * Count words and spaces in sentence.
      *
      * @param sentence sentence
+     * @param interrupt interruption flag
+     * @param pause pause flag
      * @throws InterruptedException error
      */
-    void count(String sentence) throws InterruptedException {
-        new Thread(new Calculate(sentence, true)).start();
-        new Thread(new Calculate(sentence, false)).start();
-        Thread.sleep(50L);
+    void count(String sentence, boolean interrupt, boolean pause) throws InterruptedException {
+        System.out.println("start");
+        long start = System.currentTimeMillis();
+        if (pause) {
+            Thread.sleep(1100);
+        }
+        this.threadWords = new Thread(new Calculate(sentence, true), "threadWords");
+        this.threadSpaces = new Thread(new Calculate(sentence, false), "threadSpaces");
+        this.threadWords.start();
+        this.threadSpaces.start();
+        if (interrupt) {
+            stop(this.threadWords);
+            stop(this.threadSpaces);
+        } else {
+            threadWords.join();
+            threadSpaces.join();
+        }
+        while (this.threadWords.isAlive() & this.threadSpaces.isAlive()) {
+            if (System.currentTimeMillis() - start > 1000) {
+                stop(this.threadWords);
+                stop(this.threadSpaces);
+            }
+        }
+        System.out.println("finish");
+    }
+
+    /**
+     * Stop current thread.
+     *
+     * @param current thread to stop
+     * @throws InterruptedException error
+     */
+    private void stop(Thread current) throws InterruptedException {
+        current.interrupt();
     }
 
     /**
@@ -64,7 +108,7 @@ class Space {
         /**
          * Main constructor.
          *
-         * @param sentence sentence
+         * @param sentence   sentence
          * @param countWords if true counts words, false - count spaces
          */
         Calculate(String sentence, boolean countWords) {
@@ -85,11 +129,11 @@ class Space {
          */
         @Override
         public void run() {
-            if (this.countWords) {
+            if (!threadWords.isInterrupted() && this.countWords) {
                 words = this.sentence.split("\\s+").length;
                 System.out.println(String.format("Words count %s", words));
-            } else {
-                spaces = this.sentence.length() - this.sentence.replace(" ", "").length();
+            } else if (!threadSpaces.isInterrupted() && !this.countWords) {
+                spaces = new StringTokenizer(this.sentence, " ").countTokens() - 1;
                 System.out.println(String.format("Spaces count %s", spaces));
             }
         }
