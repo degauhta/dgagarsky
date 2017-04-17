@@ -49,6 +49,6 @@ public class MyRunnableTest {
     public void whenUseAtomicWithXLoopsThenReturn2X() {
         Counter counter = new Counter(50_000_000);
         counter.count(false, false, false);
-        assertThat(counter.getSharerAtomicInteger().intValue(), is(100_000_000));
+        assertThat(counter.getSharerAtomicInteger(), is(100_000_000));
     }
 }

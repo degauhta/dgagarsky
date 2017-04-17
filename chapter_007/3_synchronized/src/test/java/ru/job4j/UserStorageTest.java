@@ -53,24 +53,56 @@ public class UserStorageTest {
 
     /**
      * Test transfer.
+     *
+     * @throws InterruptedException error
      */
     @Test
-    public void whenTransferAllMoneyToUser3ThenAllMoneyBelongsToUser3() {
-        storage.transfer(user1, user2, 100);
-        storage.transfer(user2, user3, 300);
+    public void whenTransferAllMoneyToUser3ThenAllMoneyBelongsToUser3() throws InterruptedException {
+        Thread th1 = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                storage.transfer(user1, user2, 100);
+            }
+        });
+        Thread th2 = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                storage.transfer(user2, user3, 300);
+            }
+        });
+        th1.start();
+        th2.start();
+        th1.join();
+        th2.join();
         assertThat(user3.getAmount(), is(600));
     }
 
     /**
      * Test failed transfer.
+     *
+     * @throws InterruptedException error
      */
     @Test
-    public void whenTransferFromUserWithoutMoneyThenMessage() {
-        ByteArrayOutputStream outputStream  = new ByteArrayOutputStream();
+    public void whenTransferFromUserWithoutMoneyThenMessage() throws InterruptedException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outputStream));
-        storage.transfer(user1, user2, 100);
-        storage.transfer(user1, user3, 300);
-        String expected = Joiner.on(System.lineSeparator()).join("Not enough money", "");
+        Thread th1 = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                storage.transfer(user1, user2, 100);
+            }
+        });
+        Thread th2 = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                storage.transfer(user1, user3, 300);
+            }
+        });
+        th1.start();
+        th2.start();
+        th1.join();
+        th2.join();
+        String expected = Joiner.on(System.lineSeparator()).join("Bad transfer", "");
         assertThat(outputStream.toString(), is(expected));
     }
 
@@ -86,8 +118,8 @@ public class UserStorageTest {
      * Test print.
      */
     @Test
-    public void whenPrintSrtorageThenMessageWithAllElementInfo() {
-        ByteArrayOutputStream outputStream  = new ByteArrayOutputStream();
+    public void whenPrintStorageThenMessageWithAllElementInfo() {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outputStream));
         storage.print();
         String expected = Joiner.on(System.lineSeparator()).join("1 - 100",
@@ -102,5 +134,20 @@ public class UserStorageTest {
     public void whenDelete1ElementFromStorageWith3ElementsThenSizeIs2() {
         storage.delete(user3);
         assertThat(storage.getSize(), is(2));
+    }
+
+    /**
+     * Test edit.
+     */
+    @Test
+    public void whenEditElementThenStorageContainsNewElement() {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outputStream));
+        String expected = Joiner.on(System.lineSeparator()).join("1 - 100",
+                "2 - 200", "4 - 400", "");
+        User user4 = new User("4", 400);
+        storage.edit(user3, user4);
+        storage.print();
+        assertThat(outputStream.toString(), is(expected));
     }
 }

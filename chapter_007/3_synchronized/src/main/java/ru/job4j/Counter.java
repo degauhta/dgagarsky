@@ -111,7 +111,7 @@ class Counter {
      *
      * @return shared variable
      */
-    int getShared() {
+    synchronized int getShared() {
         return this.shared;
     }
 
@@ -120,7 +120,7 @@ class Counter {
      *
      * @return variable
      */
-    static int getSharedStatic() {
+    static synchronized int getSharedStatic() {
         return sharedStatic;
     }
 
@@ -129,8 +129,8 @@ class Counter {
      *
      * @return variable
      */
-    AtomicInteger getSharerAtomicInteger() {
-        return this.sharerAtomicInteger;
+    int getSharerAtomicInteger() {
+        return sharerAtomicInteger.get();
     }
 
     /**
