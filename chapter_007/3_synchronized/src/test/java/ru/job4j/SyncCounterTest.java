@@ -6,12 +6,12 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 /**
- * MyRunnableTest class.
+ * SyncCounterTest class.
  *
  * @author Denis
  * @since 11.04.2017
  */
-public class MyRunnableTest {
+public class SyncCounterTest {
     /**
      * Test synchronized method.
      */
