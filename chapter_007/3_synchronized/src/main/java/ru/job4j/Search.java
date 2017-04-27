@@ -4,10 +4,8 @@ import java.io.File;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ArrayList;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Search class.
@@ -19,22 +17,12 @@ class Search {
     /**
      * All txt file in search folder and subFolders.
      */
-    private Map<File, Boolean> txtFiles;
-
-    /**
-     * Files contains search phrase.
-     */
-    private List<File> findInFiles;
+    private BlockingQueue<File> txtFiles;
 
     /**
      * Stop when found phrase flag.
      */
     private boolean stopWhenFound;
-
-    /**
-     * Found phrase flag.
-     */
-    private boolean found;
 
     /**
      * Search phrase.
@@ -54,8 +42,7 @@ class Search {
      * @param stopWhenFound stop search when file found
      */
     Search(String phrase, File path, boolean stopWhenFound) {
-        this.txtFiles = new HashMap<>();
-        this.findInFiles = new ArrayList<>();
+        this.txtFiles = new LinkedBlockingQueue<>();
         this.stopWhenFound = stopWhenFound;
         this.phrase = phrase;
         this.path = path;
@@ -81,12 +68,12 @@ class Search {
     }
 
     /**
-     * Return list of files contains searching phrase.
+     * Return queue of files contains searching phrase.
      *
-     * @return list variable
+     * @return queue
      */
-    synchronized List<File> getFindInFiles() {
-        return this.findInFiles;
+    BlockingQueue<File> getTxtFiles() {
+        return this.txtFiles;
     }
 
     /**
@@ -99,7 +86,7 @@ class Search {
             if (fileEntry.isDirectory()) {
                 createMapOfTxtFiles(fileEntry);
             } else {
-                txtFiles.put(fileEntry, false);
+                txtFiles.add(fileEntry);
             }
         }
     }
@@ -108,38 +95,22 @@ class Search {
      * Search phrase in files.
      */
     private synchronized void searchInFiles() {
-        File file;
-        do {
-            file = findNotCheckedFile();
-            if (file != null) {
-                findPhraseInFile(file);
-            }
-        } while (!this.found & file != null);
-    }
-
-    /**
-     * Find not checked file among all files.
-     *
-     * @return not checked file or null
-     */
-    private synchronized File findNotCheckedFile() {
-        File result = null;
-        for (Map.Entry<File, Boolean> entry : txtFiles.entrySet()) {
-            if (!entry.getValue()) {
-                result = entry.getKey();
-                entry.setValue(true);
+        for (File file : this.txtFiles) {
+            if (findPhraseInFile(file) & this.stopWhenFound) {
+                this.txtFiles.clear();
+                this.txtFiles.add(file);
                 break;
             }
         }
-        return result;
     }
 
     /**
      * Searching phrase in particular file.
      *
      * @param file file
+     * @return true if phrase is found
      */
-    private synchronized void findPhraseInFile(File file) {
+    private boolean findPhraseInFile(File file) {
         boolean result = false;
         String line;
         try (BufferedReader in = new BufferedReader(new FileReader(file))) {
@@ -149,16 +120,14 @@ class Search {
                     break;
                 }
                 result = line.contains(this.phrase);
-                if (result) {
-                    this.findInFiles.add(file);
-                }
             } while (!result);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        if (result & this.stopWhenFound) {
-            this.found = true;
+        if (!result) {
+            this.txtFiles.remove(file);
         }
+        return result;
     }
 
     /**

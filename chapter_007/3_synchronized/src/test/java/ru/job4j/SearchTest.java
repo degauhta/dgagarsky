@@ -79,7 +79,7 @@ public class SearchTest {
     public void whenSearchWithoutFlagThenFind2Files() {
         Search search = new Search("test", parentDir, false);
         search.start();
-        assertThat(search.getFindInFiles().size(), is(2));
+        assertThat(search.getTxtFiles().size(), is(2));
     }
 
     /**
@@ -89,6 +89,6 @@ public class SearchTest {
     public void whenSearchWithFlagThenFind1Files() {
         Search search = new Search("test", parentDir, true);
         search.start();
-        assertThat(search.getFindInFiles().size(), is(1));
+        assertThat(search.getTxtFiles().size(), is(1));
     }
 }
