@@ -12,12 +12,12 @@ class Consumer implements Runnable {
     /**
      * Shared queue.
      */
-    private Queue<Integer> sharedQueue;
+    private final Queue<Integer> sharedQueue;
 
     /**
      * Size of queue.
      */
-    private int size;
+    private final int size;
 
     /**
      * Default constructor.
