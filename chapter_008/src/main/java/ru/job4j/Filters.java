@@ -35,7 +35,8 @@ class Filters {
      */
     @SuppressWarnings({"SqlNoDataSourceInspection", "SqlResolve", "MalformedFormatString"})
     void selectFromUsers(String filed, String condition, boolean lowerCase) {
-        Statement statement;
+        Statement statement = null;
+        ResultSet rs = null;
         String sql;
         String name;
         try {
@@ -46,16 +47,29 @@ class Filters {
                 sql = String.format("SELECT * FROM USERS AS i WHERE i.%s %s;", filed, condition);
             }
             statement.executeQuery(sql);
-            ResultSet rs = statement.executeQuery(sql);
+            rs = statement.executeQuery(sql);
             while (rs.next()) {
                 name = rs.getString("name");
                 System.out.println(String.format("ID=%s, Name=%s",
                         rs.getInt("id"), name.substring(0, name.indexOf(32))));
             }
-            rs.close();
-            statement.close();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+            } catch (SQLException e) {
+                /*Ignore*/
+            }
+            try {
+                if (statement != null) {
+                    statement.close();
+                }
+            } catch (Exception e) {
+                /*Ignore*/
+            }
         }
     }
 }

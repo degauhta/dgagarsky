@@ -42,8 +42,9 @@ class Scripts {
      * @param url      url
      * @param user     user
      * @param password password
+     * @return connection
      */
-    void connectToServer(String url, String user, String password) {
+    Connection connectToServer(String url, String user, String password) {
         try {
             this.connection = DriverManager.getConnection(
                     url, user, password);
@@ -51,6 +52,7 @@ class Scripts {
             System.out.println("Connection Failed!");
             e.printStackTrace();
         }
+        return this.connection;
     }
 
     /**

@@ -1,6 +1,7 @@
 package ru.job4j;
 
 import com.google.common.base.Joiner;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -107,5 +108,19 @@ public class FiltersTest {
         String expected = Joiner.on(System.lineSeparator()).join("ID=1, Name=Team",
                 "ID=2, Name=Denis", "");
         assertThat(outputStream.toString(), is(expected));
+    }
+
+    /**
+     * Close connection.
+     */
+    @After
+    public void close() {
+        try {
+            if (this.connection != null) {
+                this.connection.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }
