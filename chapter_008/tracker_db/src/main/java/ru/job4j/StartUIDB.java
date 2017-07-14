@@ -1,12 +1,17 @@
-package ru.job4j.start;
+package ru.job4j;
+
+import ru.job4j.start.Tracker;
+import ru.job4j.start.MenuTracker;
+import ru.job4j.start.Input;
+import ru.job4j.start.ValidateInput;
 
 /**
- * User interface class.
+ * StartUIDB class.
  *
  * @author Denis
- * @since 24.12.2016
+ * @since 01.07.2017
  */
-public class StartUI {
+class StartUIDB {
     /**
      * Console input.
      */
@@ -15,18 +20,14 @@ public class StartUI {
      * TrackerInMemory.
      */
     private Tracker tracker;
-    /**
-     * Menu range.
-     */
-    private int[] menuRange;
 
     /**
-     * Constructor.
+     * Default constructor.
      *
-     * @param input console input.
+     * @param input   console input.
      * @param tracker tracker.
      */
-    public StartUI(Input input, Tracker tracker) {
+    private StartUIDB(Input input, Tracker tracker) {
         this.input = input;
         this.tracker = tracker;
     }
@@ -36,18 +37,18 @@ public class StartUI {
      *
      * @param args - args.
      */
-    public static void main(final String[] args) {
+    public static void main(String[] args) {
         Input input = new ValidateInput();
-        Tracker tracker = new TrackerInMemory();
-        new StartUI(input, tracker).init();
+        Tracker tracker = new TrackerDB();
+        new StartUIDB(input, tracker).init();
     }
 
     /**
      * Initialization.
      */
-    public void init() {
+    private void init() {
         MenuTracker menuTracker = new MenuTracker(input, tracker);
-        menuRange = menuTracker.fillAction();
+        int[] menuRange = menuTracker.fillAction();
         do {
             menuTracker.show();
             menuTracker.select(input.ask("Select: ", menuRange));

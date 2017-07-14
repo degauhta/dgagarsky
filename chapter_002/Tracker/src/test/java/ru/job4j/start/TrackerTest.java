@@ -18,11 +18,11 @@ public class TrackerTest {
     /**
      * Empty tracker.
      */
-    private Tracker trackerEmpty;
+    private TrackerInMemory trackerEmpty;
     /**
-     * Tracker with three items.
+     * TrackerInMemory with three items.
      */
-    private Tracker trackerFull;
+    private TrackerInMemory trackerFull;
     /**
      * First test item.
      */
@@ -51,11 +51,11 @@ public class TrackerTest {
     @Before
     public void setUp() throws Exception {
         createData = 1L;
-        trackerEmpty = new Tracker();
+        trackerEmpty = new TrackerInMemory();
         firstTestItem = new Item("firstTestItem", "desc firstTestItem", createData);
         secondTestItem = new Task("secondTestItem", "desc secondTestItem", createData);
         thirdTestItem = new Bug("thirdTestItem", "desc thirdTestItem", createData);
-        trackerFull = new Tracker();
+        trackerFull = new TrackerInMemory();
         Item item = trackerFull.add(firstTestItem);
         firstTestItem.setId(item.getId());
         item = trackerFull.add(secondTestItem);

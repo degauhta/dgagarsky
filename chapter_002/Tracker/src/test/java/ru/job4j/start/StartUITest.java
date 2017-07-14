@@ -26,7 +26,7 @@ public class StartUITest {
         StubInput input = new StubInput(new String[]{"0", "firstTestItem", "desc firstTestItem", "n",
                 "0", "secondTestItem", "desc secondTestItem",
                 "y"});
-        Tracker tracker = new Tracker();
+        TrackerInMemory tracker = new TrackerInMemory();
         StartUI ui = new StartUI(input, tracker);
         ui.init();
         itemArray[0].setId(tracker.getAll()[0].getId());
@@ -46,7 +46,7 @@ public class StartUITest {
         StubInput input = new StubInput(new String[]{"0", "firstTestItem", "desc firstTestItem", "n",
                 "1", "1", "firstTestItem-edit", "firstTestItem",
                 "y"});
-        Tracker tracker = new Tracker();
+        TrackerInMemory tracker = new TrackerInMemory();
         StartUI ui = new StartUI(input, tracker);
         ui.init();
         itemArray[0].setId(tracker.getAll()[0].getId());
@@ -66,7 +66,7 @@ public class StartUITest {
                 "0", "secondTestItem", "desc secondTestItem", "n",
                 "2", "2",
                 "y"});
-        Tracker tracker = new Tracker();
+        TrackerInMemory tracker = new TrackerInMemory();
         StartUI ui = new StartUI(input, tracker);
         ui.init();
         itemArray[0].setId(tracker.getAll()[0].getId());
@@ -86,7 +86,7 @@ public class StartUITest {
         StubInput input = new StubInput(new String[]{"0", "firstTestItem", "disc", "n",
                 "0", "secondTestItem", "desc secondTestItem",
                 "y"});
-        Tracker tracker = new Tracker();
+        TrackerInMemory tracker = new TrackerInMemory();
         StartUI ui = new StartUI(input, tracker);
         ui.init();
         itemArray[0].setId(tracker.getAll()[0].getId());
