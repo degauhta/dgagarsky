@@ -2,13 +2,15 @@ package ru.job4j;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
+import java.sql.SQLException;
 
 /**
  * Created by dega on 25.06.2017.
  */
+@SuppressWarnings("SqlNoDataSourceInspection")
 class ConnectDB {
     /**
      * Connection.
@@ -61,9 +63,11 @@ class ConnectDB {
     @SuppressWarnings({"SqlNoDataSourceInspection", "SqlResolve", "MalformedFormatString"})
     private boolean checkDBExists(String dbName) {
         boolean result = false;
-        try (Statement statement = this.connection.createStatement()) {
-            String sql = "SELECT TRUE AS exist FROM pg_database WHERE datname='" + dbName + "';";
-            try (ResultSet rs = statement.executeQuery(sql)) {
+        try {
+            String sql = "SELECT TRUE AS exist FROM pg_database WHERE datname=?;";
+            PreparedStatement preparedStatement = preparedStatement(sql);
+            preparedStatement.setString(1, dbName);
+            try (ResultSet rs = preparedStatement.executeQuery()) {
                 while (rs.next()) {
                     result = rs.getBoolean("exist");
                 }
@@ -80,12 +84,10 @@ class ConnectDB {
      * @param dbName DB name.
      */
     private void createDB(String dbName) {
-        Statement statement;
         if (this.connection != null) {
-            try {
-                statement = connection.createStatement();
-                statement.executeUpdate(String.format("CREATE DATABASE %s", dbName));
-                statement.close();
+            String sql = String.format("CREATE DATABASE %s", dbName);
+            try (PreparedStatement preparedStatement = preparedStatement(sql)) {
+                preparedStatement.executeUpdate();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -99,18 +101,31 @@ class ConnectDB {
      */
     @SuppressWarnings("SqlNoDataSourceInspection")
     private void createTables() {
-        Statement statement;
         String sql;
-        try {
+        try (Statement statement = this.connection.createStatement()) {
             sql = "CREATE TABLE TASKS "
                     + "(ID SERIAL PRIMARY KEY, "
-                    + " NAME CHARACTER(1000) NOT NULL, "
-                    + " DESCRIPTION CHARACTER(1000) NOT NULL);";
-            statement = this.connection.createStatement();
+                    + " NAME TEXT NOT NULL, "
+                    + " DESCRIPTION TEXT NOT NULL);";
             statement.executeUpdate(sql);
-            statement.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Precompile SQL statement.
+     *
+     * @param sql sql string
+     * @return prepared statement
+     */
+    private PreparedStatement preparedStatement(String sql) {
+        PreparedStatement preparedStatement = null;
+        try {
+            preparedStatement = this.connection.prepareStatement(sql);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return preparedStatement;
     }
 }

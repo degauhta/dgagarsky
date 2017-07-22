@@ -4,9 +4,11 @@ import ru.job4j.models.Item;
 import ru.job4j.start.Tracker;
 
 import java.sql.Connection;
-import java.sql.ResultSet;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * TrackerDB class.
@@ -14,6 +16,7 @@ import java.sql.Statement;
  * @author Denis
  * @since 01.07.2017
  */
+@SuppressWarnings({"SqlNoDataSourceInspection", "SqlResolve"})
 class TrackerDB implements Tracker {
     /**
      * Connection.
@@ -34,16 +37,14 @@ class TrackerDB implements Tracker {
      * @return ref to request.
      */
     public Item add(Item item) {
-        Statement statement;
-        String sql;
-        try {
-            statement = connection.createStatement();
-            sql = String.format("INSERT INTO TASKS (NAME, DESCRIPTION) " +
-                            "VALUES ('%s','%s') RETURNING ID;", item.getName(), item.getDescription());
-            ResultSet rs = statement.executeQuery(sql);
-            rs.next();
-            item.setId(String.valueOf(rs.getInt(1)));
-            statement.close();
+        String sql = "INSERT INTO TASKS (NAME, DESCRIPTION) VALUES (?, ?) RETURNING ID;";
+        try (PreparedStatement preparedStatement = preparedStatement(sql)) {
+            preparedStatement.setString(1, item.getName());
+            preparedStatement.setString(2, item.getDescription());
+            try (ResultSet rs = preparedStatement.executeQuery()) {
+                rs.next();
+                item.setId(String.valueOf(rs.getInt(1)));
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -57,33 +58,24 @@ class TrackerDB implements Tracker {
      * @return finding request.
      */
     public Item[] filterRequest(String sub) {
-        Item[] result = null;
-        int length = 0;
-        int i = 0;
         String name;
         String description;
-        try (Statement statement = this.connection.createStatement()) {
-            String sql = String.format("SELECT COUNT(*) FROM TASKS "
-                    + "WHERE NAME LIKE '%%%s%%' OR DESCRIPTION LIKE '%%%s%%'", sub, sub);
-            try (ResultSet rs = statement.executeQuery(sql)) {
-                while (rs.next()) {
-                    length = rs.getInt(1);
-                }
-            }
-            sql = String.format("SELECT * FROM TASKS "
-                    + "WHERE NAME LIKE '%%%s%%' OR DESCRIPTION LIKE '%%%s%%'", sub, sub);
-            try (ResultSet rs = statement.executeQuery(sql)) {
-                result = new Item[length];
+        List<Item> list = new ArrayList<>();
+        String sql = "SELECT * FROM TASKS WHERE NAME LIKE ? OR DESCRIPTION LIKE ?";
+        try (PreparedStatement preparedStatement = preparedStatement(sql)) {
+            preparedStatement.setString(1, "%" + sub + "%");
+            preparedStatement.setString(2, "%" + sub + "%");
+            try (ResultSet rs = preparedStatement.executeQuery()) {
                 while (rs.next()) {
                     name = rs.getString("name");
                     description = rs.getString("description");
-                    result[i++] = new Item(name.replaceAll("\\s+$", ""), description.replaceAll("\\s+$", ""), 1L);
+                    list.add(new Item(name, description, 1L));
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return result;
+        return list.toArray(new Item[list.size()]);
     }
 
     /**
@@ -91,32 +83,25 @@ class TrackerDB implements Tracker {
      *
      * @return all requests.
      */
-    @SuppressWarnings({"SqlNoDataSourceInspection", "SqlResolve"})
     public Item[] getAll() {
-        Item[] result = null;
-        int length = 0;
-        int i = 0;
         String name;
         String description;
-        try (Statement statement = this.connection.createStatement()) {
-            try (ResultSet rs = statement.executeQuery("SELECT COUNT(*) FROM TASKS")) {
-                while (rs.next()) {
-                    length = rs.getInt(1);
-                }
-            }
-            try (ResultSet rs = statement.executeQuery("SELECT * FROM TASKS ORDER BY id ASC")) {
-                result = new Item[length];
+        List<Item> list = new ArrayList<>();
+        String sql = "SELECT * FROM TASKS ORDER BY id ASC";
+        try (PreparedStatement preparedStatement = preparedStatement(sql)) {
+            try (ResultSet rs = preparedStatement.executeQuery()) {
                 while (rs.next()) {
                     name = rs.getString("name");
                     description = rs.getString("description");
-                    result[i] = new Item(name.replaceAll("\\s+$", ""), description.replaceAll("\\s+$", ""), 1L);
-                    result[i++].setId(String.valueOf(rs.getInt("id")));
+                    Item item = new Item(name, description, 1L);
+                    item.setId(String.valueOf(rs.getInt("id")));
+                    list.add(item);
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return result;
+        return list.toArray(new Item[list.size()]);
     }
 
     /**
@@ -127,10 +112,12 @@ class TrackerDB implements Tracker {
      */
     public Item editRequest(Item item) {
         Item result = null;
-        try (Statement statement = this.connection.createStatement()) {
-            String sql = String.format("UPDATE TASKS SET NAME = '%s', "
-                    + "DESCRIPTION = '%s' WHERE ID=%s;", item.getName(), item.getDescription(), item.getId());
-            if (statement.executeUpdate(sql) != 0) {
+        String sql = "UPDATE TASKS SET NAME = ?, DESCRIPTION = ? WHERE ID=?;";
+        try (PreparedStatement preparedStatement = preparedStatement(sql)) {
+            preparedStatement.setString(1, item.getName());
+            preparedStatement.setString(2, item.getDescription());
+            preparedStatement.setInt(3, Integer.valueOf(item.getId()));
+            if (preparedStatement.executeUpdate() != 0) {
                 result = item;
             }
         } catch (SQLException e) {
@@ -140,19 +127,38 @@ class TrackerDB implements Tracker {
     }
 
     /**
+     * Remove request.
+     *
      * @param removeItem request that need to delete.
      * @return true if remove successful.
      */
     public boolean removeRequest(Item removeItem) {
         boolean result = false;
-        try (Statement statement = this.connection.createStatement()) {
-            String sql = String.format("DELETE from tasks where ID = %s;", removeItem.getId());
-            if (statement.executeUpdate(sql) != 0) {
+        String sql = "DELETE from tasks where ID = ?;";
+        try (PreparedStatement preparedStatement = preparedStatement(sql)) {
+            preparedStatement.setInt(1, Integer.valueOf(removeItem.getId()));
+            if (preparedStatement.executeUpdate() != 0) {
                 result = true;
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return result;
+    }
+
+    /**
+     * Precompile SQL statement.
+     *
+     * @param sql sql string
+     * @return prepared statement
+     */
+    private PreparedStatement preparedStatement(String sql) {
+        PreparedStatement preparedStatement = null;
+        try {
+            preparedStatement = this.connection.prepareStatement(sql);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return preparedStatement;
     }
 }
