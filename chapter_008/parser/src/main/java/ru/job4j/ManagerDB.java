@@ -1,8 +1,5 @@
 package ru.job4j;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -20,24 +17,19 @@ import java.sql.SQLException;
 @SuppressWarnings({"SqlNoDataSourceInspection", "SqlResolve"})
 class ManagerDB {
     /**
-     * Properties.
-     */
-    private Properties prop;
-
-    /**
      * Connection.
      */
     private Connection connection;
 
     /**
-     * Default constructor.
+     * Start.
+     *
+     * @param url url
+     * @param user user
+     * @param password password
+     * @param dbName dbName
      */
-    ManagerDB() {
-        readAppProperties();
-        String url = prop.getProperty("dbUrl");
-        String user = prop.getProperty("dbUser");
-        String password = prop.getProperty("dbPassword");
-        String dbName = prop.getProperty("dbName");
+    void start(String url, String user, String password, String dbName) {
         connectToServer(url, user, password);
         if (!checkDBExists(dbName)) {
             createDB(dbName);
@@ -55,7 +47,7 @@ class ManagerDB {
      * @param user     user
      * @param password password
      */
-    private void connectToServer(String url, String user, String password) {
+    void connectToServer(String url, String user, String password) {
         try {
             this.connection = DriverManager.getConnection(url, user, password);
         } catch (SQLException e) {
@@ -71,7 +63,7 @@ class ManagerDB {
      * @return true - if exists
      */
     @SuppressWarnings({"SqlNoDataSourceInspection", "SqlResolve", "MalformedFormatString"})
-    private boolean checkDBExists(String dbName) {
+    boolean checkDBExists(String dbName) {
         boolean result = false;
         String sql = "SELECT TRUE AS exist FROM pg_database WHERE datname=?;";
         try (PreparedStatement preparedStatement = preparedStatement(sql)) {
@@ -92,7 +84,7 @@ class ManagerDB {
      *
      * @param dbName DB name.
      */
-    private void createDB(String dbName) {
+    void createDB(String dbName) {
         if (this.connection != null) {
             String sql = String.format("CREATE DATABASE %s", dbName);
             try (PreparedStatement preparedStatement = preparedStatement(sql)) {
@@ -109,11 +101,11 @@ class ManagerDB {
      * Create tables in DB.
      */
     @SuppressWarnings("SqlNoDataSourceInspection")
-    private void createTables() {
+    void createTables() {
         Statement statement;
         String sql;
         try {
-            sql = "CREATE TABLE VACANCIES "
+            sql = "CREATE TABLE IF NOT EXISTS VACANCIES "
                     + "(ID SERIAL PRIMARY KEY, "
                     + " DATE CHARACTER(16) NOT NULL, "
                     + " TOPIC CHARACTER(1000) NOT NULL, "
@@ -130,29 +122,24 @@ class ManagerDB {
     /**
      * Add entry in database.
      *
-     * @param topicDate       topic date
-     * @param topic           topic name
-     * @param fullDescription topic full description
-     * @param url             topic url
+     * @param vacancy vacancy
      * @return true if added successfully
      */
-    boolean addEntry(String topicDate, String topic, String fullDescription, String url) {
-        fullDescription = fullDescription.replace("\n", "").replace("\r", "");
-        boolean result = findEntry(topicDate, topic, url);
-        if (!result) {
-            String sql = "INSERT INTO VACANCIES (DATE, TOPIC, FULLDESCRIPTION, URL) "
-                    + "VALUES (?, ?, ?, ?);";
-            try (PreparedStatement preparedStatement = preparedStatement(sql)) {
-                preparedStatement.setString(1, topicDate);
-                preparedStatement.setString(2, topic);
-                preparedStatement.setString(3, fullDescription);
-                preparedStatement.setString(4, url);
-                preparedStatement.executeUpdate();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+    boolean addEntry(Vacancy vacancy) {
+        boolean result = true;
+        String sql = "INSERT INTO VACANCIES (DATE, TOPIC, FULLDESCRIPTION, URL) "
+                + "VALUES (?, ?, ?, ?);";
+        try (PreparedStatement preparedStatement = preparedStatement(sql)) {
+            preparedStatement.setString(1, vacancy.getTopicDate());
+            preparedStatement.setString(2, vacancy.getTopic());
+            preparedStatement.setString(3, vacancy.getFullDescription());
+            preparedStatement.setString(4, vacancy.getUrl());
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            result = false;
+            e.printStackTrace();
         }
-        return !result;
+        return result;
     }
 
     /**
@@ -163,7 +150,7 @@ class ManagerDB {
      * @param url       topic url
      * @return true if find topic in database
      */
-    private boolean findEntry(String topicDate, String topic, String url) {
+    boolean findEntry(String topicDate, String topic, String url) {
         boolean result = true;
         String sql = "SELECT * FROM VACANCIES WHERE DATE = ? and TOPIC = ? and URL = ?";
         try (PreparedStatement preparedStatement = preparedStatement(sql)) {
@@ -182,20 +169,6 @@ class ManagerDB {
     }
 
     /**
-     * Read properties.
-     */
-    @SuppressWarnings("ConstantConditions")
-    private void readAppProperties() {
-        prop = new Properties();
-        ClassLoader classLoader = getClass().getClassLoader();
-        try (InputStream inputStream = classLoader.getResourceAsStream("app.properties")) {
-            this.prop.load(inputStream);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
      * Precompile SQL statement.
      *
      * @param sql sql string
@@ -209,5 +182,22 @@ class ManagerDB {
             e.printStackTrace();
         }
         return preparedStatement;
+    }
+
+    /**
+     * Get connection.
+     *
+     * @return connection
+     */
+    Connection getConnection() {
+        return connection;
+    }
+
+    /**
+     * Set connection.
+     * @param connection connection
+     */
+    void setConnection(Connection connection) {
+        this.connection = connection;
     }
 }

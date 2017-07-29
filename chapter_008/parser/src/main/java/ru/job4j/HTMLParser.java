@@ -6,10 +6,11 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.File;
 import java.io.InputStream;
+import java.io.IOException;
 import java.io.OutputStream;
+import java.io.FileOutputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -50,6 +51,13 @@ class HTMLParser {
     private ManagerDB managerDB;
 
     /**
+     * Default constructor.
+     */
+    HTMLParser() {
+        readAppProperties();
+    }
+
+    /**
      * Main method.
      *
      * @param args arguments
@@ -62,13 +70,15 @@ class HTMLParser {
      * Start parse.
      */
     private void startParsing() {
-        if (checkNeedsForRun()) {
-            this.managerDB = new ManagerDB();
+        this.managerDB = new ManagerDB();
+        this.managerDB.start(this.prop.getProperty("dbUrl"), this.prop.getProperty("dbUser"),
+                this.prop.getProperty("dbPassword"), this.prop.getProperty("dbName"));
+        if (checkNeedsForRun(prop.getProperty("lastUpdate"), prop.getProperty("runOncePerDay"))) {
             String url = "http://www.sql.ru/forum/job-offers";
             Document doc = getURLConnection(url);
             int forumPage = 2;
             while (lastYearTopics < 10) {
-                traverseForumTable(doc);
+                traverseForumTable(doc, parseDateToStringFormat(this.prop.getProperty("lastUpdate")));
                 doc = getURLConnection(String.format("%s/%s", url, forumPage++));
             }
             writeLastUpdateProperty();
@@ -76,15 +86,27 @@ class HTMLParser {
     }
 
     /**
+     * Read app properties.
+     */
+    private void readAppProperties() {
+        this.prop = new Properties();
+        ClassLoader classLoader = getClass().getClassLoader();
+        try (InputStream inputStream = classLoader.getResourceAsStream("app.properties")) {
+            this.prop.load(inputStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * Check if it need to run program.
      *
+     * @param lastUpdate    last update
+     * @param runOncePerDay run once per day
      * @return true if need to run
      */
-    private boolean checkNeedsForRun() {
+    boolean checkNeedsForRun(String lastUpdate, String runOncePerDay) {
         boolean result = true;
-        readAppProperties();
-        String lastUpdate = prop.getProperty("lastUpdate");
-        String runOncePerDay = prop.getProperty("runOncePerDay");
         DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd");
         if (runOncePerDay.equals("true")
                 & dateFormat.format(new Date()).compareTo(lastUpdate) == 0) {
@@ -113,51 +135,59 @@ class HTMLParser {
     /**
      * Traverse forum table.
      *
-     * @param doc HTML Document
+     * @param doc      HTML Document
+     * @param lastLoad last load
      */
-    private void traverseForumTable(Document doc) {
+    private void traverseForumTable(Document doc, Date lastLoad) {
         Elements table = doc.getElementsByClass("forumTable");
         for (Element tr : table.get(0).children().get(0).children()) {
             if (this.lastYearTopics < 10
                     && tr.getElementsByClass("postslisttopic").text().length() > 0) {
-                logSuitableVacancy(tr);
+                Vacancy vacancy = createSuitableVacancy(tr, lastLoad);
+                if (vacancy != null
+                        && !managerDB.findEntry(vacancy.getTopicDate(),
+                        vacancy.getTopic(), vacancy.getUrl())) {
+                    managerDB.addEntry(vacancy);
+                    LOGGER.info(String.format("(%s) %s - %s(%s)", vacancy.getTopicDate(),
+                            vacancy.getTopic(), vacancy.getFullDescription(), vacancy.getUrl()));
+                }
             }
         }
     }
 
     /**
-     * Log suitable vacancy.
+     * Create vacancy, if it satisfy the condition.
      *
-     * @param tr row in forum table
+     * @param tr       row in forum table
+     * @param lastLoad last load
+     * @return new vacancy or null
      */
-    private void logSuitableVacancy(Element tr) {
-        String url;
-        String fullDescription;
-        String topicDate;
-        Date lastLoad = getDateOfLastLoadInformation();
+    Vacancy createSuitableVacancy(Element tr, Date lastLoad) {
+        Vacancy vacancy = null;
         int currentYear = Integer.valueOf(new SimpleDateFormat("yyyy").format(new Date()));
         this.topicYear = currentYear;
         String topic = tr.getElementsByClass("postslisttopic").text().toLowerCase();
         if (!topic.equals("ответов")
                 && !topic.substring(0, 6).equals("важно:")
                 && !topic.contains("[закрыт]")
-                && (topic.contains("java") | topic.contains("jee") | topic.contains("j2ee")
-                & !topic.contains("java script") & !topic.contains("javascript"))) {
-            url = tr.getElementsByClass("postslisttopic").select("a").attr("href");
+                && (topic.contains("java") | topic.contains("jee") | topic.contains("j2ee"))
+                & (!topic.contains("java script") & !topic.contains("javascript"))) {
+            String url = tr.getElementsByClass("postslisttopic")
+                    .select("a").attr("href");
             Document doc = getURLConnection(url);
-            fullDescription = doc.getElementsByClass("msgBody").get(1).text();
-            fullDescription = fullDescription.replace("\r", " ");
-            fullDescription = fullDescription.replace("\n", " ");
-            topicDate = formatDateToStringYYYYMMDDhhmm(doc.getElementsByClass("msgFooter").get(0).text());
+            String fullDescription = doc
+                    .getElementsByClass("msgBody").get(1)
+                    .text().replaceAll("(\r\n|\n)", "<br />");
+            String topicDate = formatDateToStringYYYYMMDDhhmm(doc
+                    .getElementsByClass("msgFooter").get(0).text());
             if (this.topicYear < currentYear) {
                 this.lastYearTopics++;
             } else if (lastLoad == null || lastLoad.compareTo(formatStringToDate(topicDate)) < 0) {
-                if (managerDB.addEntry(topicDate, topic, fullDescription, url)) {
-                    LOGGER.info(String.format("(%s) %s - %s(%s)", topicDate, topic, fullDescription, url));
-                }
+                vacancy = new Vacancy(topicDate, topic, fullDescription, url);
                 this.lastYearTopics = 0;
             }
         }
+        return vacancy;
     }
 
     /**
@@ -166,7 +196,7 @@ class HTMLParser {
      * @param fullDate full date
      * @return YYYY.MM.DD hh:mm representation of date
      */
-    private String formatDateToStringYYYYMMDDhhmm(String fullDate) {
+    String formatDateToStringYYYYMMDDhhmm(String fullDate) {
         String result = "";
         DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd");
         String[] splitDate = fullDate.split(" ");
@@ -207,7 +237,7 @@ class HTMLParser {
      * @param month month
      * @return digit (MM) representation
      */
-    private String getDigitMonthRepresentation(String month) {
+    String getDigitMonthRepresentation(String month) {
         String result = "";
         switch (month) {
             case "янв":
@@ -253,26 +283,13 @@ class HTMLParser {
     }
 
     /**
-     * Read app properties.
-     */
-    private void readAppProperties() {
-        this.prop = new Properties();
-        ClassLoader classLoader = getClass().getClassLoader();
-        try (InputStream inputStream = classLoader.getResourceAsStream("app.properties")) {
-            this.prop.load(inputStream);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
      * Get date of last load information.
      *
+     * @param lastUpdate last update
      * @return date
      */
-    private Date getDateOfLastLoadInformation() {
+    Date parseDateToStringFormat(String lastUpdate) {
         Date date = null;
-        String lastUpdate = this.prop.getProperty("lastUpdate");
         if (lastUpdate.length() > 0) {
             try {
                 DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd hh:mm");
@@ -291,10 +308,20 @@ class HTMLParser {
         DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd hh:mm");
         this.prop.setProperty("lastUpdate", dateFormat.format(new Date()));
         ClassLoader classLoader = getClass().getClassLoader();
-        try (OutputStream out = new FileOutputStream(classLoader.getResource("app.properties").getFile())) {
+        File file = new File(classLoader.getResource("app.properties").getPath().replaceAll("%20", " "));
+        try (OutputStream out = new FileOutputStream(file)) {
             this.prop.store(out, "properties");
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Get manager.
+     *
+     * @return manager.
+     */
+    ManagerDB getManagerDB() {
+        return this.managerDB;
     }
 }
