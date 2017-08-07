@@ -23,11 +23,6 @@ import java.util.Properties;
 @SuppressWarnings({"SqlDialectInspection", "SqlNoDataSourceInspection"})
 public class DBManager {
     /**
-     * Connection.
-     */
-    private Connection connection;
-
-    /**
      * Start.
      *
      * @param classLoader class loader
@@ -39,13 +34,11 @@ public class DBManager {
         String dbUser = prop.getProperty("dbUser");
         String dbPassword = prop.getProperty("dbPassword");
         String dbName = prop.getProperty("dbName");
-        this.connection = connectToServer(dbUrl, dbUser, dbPassword);
-        if (this.connection != null && !checkDBExists(this.connection, dbName)) {
-            createDB(this.connection, dbName);
-            this.connection = connectToServer(String.format("%s%s", dbUrl, dbName), dbUser, dbPassword);
-            createTables(this.connection);
-        } else {
-            this.connection = connectToServer(String.format("%s%s", dbUrl, dbName), dbUser, dbPassword);
+        Connection connection = connectToServer(dbUrl, dbUser, dbPassword);
+        if (connection != null && !checkDBExists(connection, dbName)) {
+            createDB(connection, dbName);
+            connection = connectToServer(String.format("%s%s", dbUrl, dbName), dbUser, dbPassword);
+            createTables(connection);
         }
     }
 
@@ -73,7 +66,7 @@ public class DBManager {
      * @param dbPassword Password
      * @return connection
      */
-    public Connection connectToServer(String dbUrl, String dbUser, String dbPassword) {
+    Connection connectToServer(String dbUrl, String dbUser, String dbPassword) {
         try {
             Class.forName("org.postgresql.Driver");
         } catch (ClassNotFoundException e) {
@@ -170,14 +163,15 @@ public class DBManager {
     /**
      * Add entry in database.
      *
+     * @param connection connection
      * @param user user
      * @return true if added successfully
      */
-    public boolean addEntry(User user) {
+    public boolean addEntry(Connection connection, User user) {
         boolean result = true;
         String sql = "INSERT INTO USERS (NAME, LOGIN, EMAIL, CREATEDATE) "
                 + "VALUES (?, ?, ?, ?);";
-        try (PreparedStatement preparedStatement = preparedStatement(sql)) {
+        try (PreparedStatement preparedStatement = preparedStatement(connection, sql)) {
             preparedStatement.setString(1, user.getName());
             preparedStatement.setString(2, user.getLogin());
             preparedStatement.setString(3, user.getEmail());
@@ -194,15 +188,16 @@ public class DBManager {
     /**
      * Find entry in database by name, login and email.
      *
+     * @param connection connection
      * @param name  name
      * @param login login
      * @param email email
      * @return true if find in database
      */
-    public boolean findEntry(String name, String login, String email) {
+    public boolean findEntry(Connection connection, String name, String login, String email) {
         boolean result = false;
         String sql = "SELECT * FROM USERS WHERE NAME = ? and LOGIN = ? and EMAIL = ?";
-        try (PreparedStatement preparedStatement = preparedStatement(sql)) {
+        try (PreparedStatement preparedStatement = preparedStatement(connection, sql)) {
             preparedStatement.setString(1, name);
             preparedStatement.setString(2, login);
             preparedStatement.setString(3, email);
@@ -221,13 +216,14 @@ public class DBManager {
      * Edit entry in database.
      *
      * @param userData user data
+     * @param connection connection
      * @return true if edit successfully
      */
-    public boolean editEntry(Map<String, String> userData) {
+    public boolean editEntry(Connection connection, Map<String, String> userData) {
         boolean result = false;
         String sql = "UPDATE USERS SET NAME = ?, LOGIN = ?, EMAIL=? "
                 + "WHERE NAME = ? AND LOGIN = ? AND EMAIL=?";
-        try (PreparedStatement preparedStatement = preparedStatement(sql)) {
+        try (PreparedStatement preparedStatement = preparedStatement(connection, sql)) {
             preparedStatement.setString(1, userData.get("newName"));
             preparedStatement.setString(2, userData.get("newLogin"));
             preparedStatement.setString(3, userData.get("newEmail"));
@@ -247,12 +243,13 @@ public class DBManager {
      * Delete entry in database.
      *
      * @param userData user data
+     * @param connection connection
      * @return true if edit successfully
      */
-    public boolean deleteEntry(Map<String, String> userData) {
+    public boolean deleteEntry(Connection connection, Map<String, String> userData) {
         boolean result = false;
         String sql = "DELETE FROM USERS WHERE NAME = ? AND LOGIN = ? AND EMAIL=?";
-        try (PreparedStatement preparedStatement = preparedStatement(sql)) {
+        try (PreparedStatement preparedStatement = preparedStatement(connection, sql)) {
             preparedStatement.setString(1, userData.get("name"));
             preparedStatement.setString(2, userData.get("login"));
             preparedStatement.setString(3, userData.get("email"));
@@ -263,21 +260,5 @@ public class DBManager {
             e.printStackTrace();
         }
         return result;
-    }
-
-    /**
-     * Precompile SQL statement.
-     *
-     * @param sql sql string
-     * @return prepared statement
-     */
-    private PreparedStatement preparedStatement(String sql) {
-        PreparedStatement preparedStatement = null;
-        try {
-            preparedStatement = this.connection.prepareStatement(sql);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return preparedStatement;
     }
 }

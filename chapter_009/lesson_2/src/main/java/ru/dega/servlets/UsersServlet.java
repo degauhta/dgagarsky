@@ -3,13 +3,18 @@ package ru.dega.servlets;
 import ru.dega.DBManager;
 import ru.dega.models.User;
 
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,6 +32,11 @@ public class UsersServlet extends HttpServlet {
     private DBManager dbManager;
 
     /**
+     * Data source.
+     */
+    private DataSource ds;
+
+    /**
      * Init servlet.
      *
      * @throws ServletException error
@@ -34,6 +44,12 @@ public class UsersServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
         setDBManager(getClass().getClassLoader());
+        try {
+            InitialContext initContext = new InitialContext();
+            this.ds = (DataSource) initContext.lookup("java:comp/env/jdbc/users");
+        } catch (NamingException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -41,13 +57,28 @@ public class UsersServlet extends HttpServlet {
      *
      * @param classLoader class loader
      */
-    void setDBManager(ClassLoader classLoader) {
+    private void setDBManager(ClassLoader classLoader) {
         this.dbManager = new DBManager();
         try {
-            this.dbManager.start(classLoader);
+            dbManager.start(classLoader);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Get connection from data source.
+     *
+     * @return connection
+     */
+    private Connection getConnection() {
+        Connection connection = null;
+        try {
+            connection = ds.getConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return connection;
     }
 
     /**
@@ -67,9 +98,10 @@ public class UsersServlet extends HttpServlet {
         Map<String, String> userData = getLoginDataFromRequestBody(req);
         PrintWriter printWriter = new PrintWriter(resp.getWriter());
         if (userData.size() == 3) {
-            this.dbManager.addEntry(new User(userData.get("name"),
-                    userData.get("login"), userData.get("email"), LocalDateTime.now()));
-            printWriter.append(String.format("create user %s", userData.get("name")));
+            if (this.dbManager.addEntry(getConnection(), new User(userData.get("name"),
+                    userData.get("login"), userData.get("email"), LocalDateTime.now()))) {
+                printWriter.append(String.format("create user %s", userData.get("name")));
+            }
         } else {
             printWriter.append("not enough data");
         }
@@ -91,7 +123,7 @@ public class UsersServlet extends HttpServlet {
         String login = req.getParameter("login");
         String email = req.getParameter("email");
         PrintWriter printWriter = new PrintWriter(resp.getWriter());
-        if (this.dbManager.findEntry(name, login, email)) {
+        if (this.dbManager.findEntry(getConnection(), name, login, email)) {
             printWriter.append("user found");
         } else {
             printWriter.append("user not found");
@@ -114,7 +146,7 @@ public class UsersServlet extends HttpServlet {
         Map<String, String> userData = getLoginDataFromRequestBody(req);
         PrintWriter printWriter = new PrintWriter(resp.getWriter());
         if (userData.size() == 6) {
-            this.dbManager.editEntry(userData);
+            this.dbManager.editEntry(getConnection(), userData);
             printWriter.append(String.format("update user %s", userData.get("name")));
         } else {
             printWriter.append("not enough data");
@@ -137,7 +169,7 @@ public class UsersServlet extends HttpServlet {
         Map<String, String> userData = getLoginDataFromRequestBody(req);
         PrintWriter printWriter = new PrintWriter(resp.getWriter());
         if (userData.size() == 3) {
-            this.dbManager.deleteEntry(userData);
+            this.dbManager.deleteEntry(getConnection(), userData);
             printWriter.append(String.format("delete user %s", userData.get("name")));
         } else {
             printWriter.append("not enough data");

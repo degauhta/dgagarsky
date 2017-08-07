@@ -1,4 +1,10 @@
 <web-app>
+    <resource-ref>
+        <description>DB Connection</description>
+        <res-ref-name>jdbc/users</res-ref-name>
+        <res-type>javax.sql.DataSource</res-type>
+        <res-auth>Container</res-auth>
+    </resource-ref>
     <servlet>
         <servlet-name>UsersServlet</servlet-name>
         <servlet-class>ru.dega.servlets.UsersServlet</servlet-class>
