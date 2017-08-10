@@ -1,0 +1,1 @@
+DROP DATABASE dega_servlets_html;
