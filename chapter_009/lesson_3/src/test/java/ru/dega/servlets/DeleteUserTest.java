@@ -17,8 +17,6 @@ import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.PrintWriter;
-import java.io.BufferedReader;
-import java.io.StringReader;
 
 import java.sql.SQLException;
 
@@ -99,17 +97,14 @@ public class DeleteUserTest {
      */
     @Test
     public void testPost() throws ServletException, IOException, SQLException {
-        String expectedText = "login=login";
-        BufferedReader reader = new BufferedReader(new StringReader(expectedText));
         StringWriter sw = new StringWriter();
 
-        Mockito.when(request.getReader()).thenReturn(reader);
-        Mockito.when(request.getServletPath()).thenReturn("/delete");
+        Mockito.when(request.getParameter("login")).thenReturn("test-login");
         Mockito.when(response.getWriter()).thenReturn(new PrintWriter(sw));
         Mockito.when(ds.getConnection()).thenReturn(null);
         Mockito.when(dbManager.deleteEntry(any(), any())).thenReturn(true);
 
         deleteUserServlet.doPost(request, response);
-        assertThat(sw.toString(), is("delete user login"));
+        assertThat(sw.toString(), is("delete user test-login"));
     }
 }

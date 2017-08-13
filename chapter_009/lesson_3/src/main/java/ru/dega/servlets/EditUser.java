@@ -1,7 +1,6 @@
 package ru.dega.servlets;
 
 import ru.dega.DBManager;
-import ru.dega.HtmlBodyParse;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -14,7 +13,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Map;
 
 /**
  * EditUser class.
@@ -108,13 +106,10 @@ public class EditUser extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setContentType("text/html");
-        Map<String, String> userData = HtmlBodyParse.getLoginDataFromRequestBody(req);
         PrintWriter printWriter = new PrintWriter(resp.getWriter());
-        if (userData.size() == 3) {
-            if (this.dbManager.editEntry(getConnection(),
-                    userData.get("login"), userData.get("name"), userData.get("email"))) {
-                printWriter.append(String.format("edit user %s", userData.get("login")));
-            }
+        if (this.dbManager.editEntry(getConnection(), req.getParameter("login"),
+                req.getParameter("name"), req.getParameter("email"))) {
+            printWriter.append(String.format("edit user %s", req.getParameter("login")));
         } else {
             printWriter.append("not enough data to edit user");
         }

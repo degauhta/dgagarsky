@@ -17,8 +17,6 @@ import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.PrintWriter;
-import java.io.BufferedReader;
-import java.io.StringReader;
 
 import java.sql.SQLException;
 
@@ -99,17 +97,16 @@ public class CreateUserTest {
      */
     @Test
     public void testPost() throws ServletException, IOException, SQLException {
-        String expectedText = "name=name&login=login&email=email";
-        BufferedReader reader = new BufferedReader(new StringReader(expectedText));
         StringWriter sw = new StringWriter();
 
-        Mockito.when(request.getServletPath()).thenReturn("/create");
-        Mockito.when(request.getReader()).thenReturn(reader);
         Mockito.when(response.getWriter()).thenReturn(new PrintWriter(sw));
+        Mockito.when(request.getParameter("name")).thenReturn("test-name");
+        Mockito.when(request.getParameter("login")).thenReturn("test-login");
+        Mockito.when(request.getParameter("email")).thenReturn("test-email");
         Mockito.when(ds.getConnection()).thenReturn(null);
         Mockito.when(dbManager.addEntry(any(), any())).thenReturn(true);
 
         createUserServlet.doPost(request, response);
-        assertThat(sw.toString(), is("create user login"));
+        assertThat(sw.toString(), is("create user test-login"));
     }
 }

@@ -17,8 +17,6 @@ import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.PrintWriter;
-import java.io.BufferedReader;
-import java.io.StringReader;
 
 import java.sql.SQLException;
 
@@ -99,17 +97,16 @@ public class EditUserTest {
      */
     @Test
     public void testPost() throws ServletException, IOException, SQLException {
-        String expectedText = "login=login&name=name&email=mail";
-        BufferedReader reader = new BufferedReader(new StringReader(expectedText));
         StringWriter sw = new StringWriter();
 
-        Mockito.when(request.getReader()).thenReturn(reader);
-        Mockito.when(request.getServletPath()).thenReturn("/edit");
         Mockito.when(response.getWriter()).thenReturn(new PrintWriter(sw));
+        Mockito.when(request.getParameter("name")).thenReturn("test-name");
+        Mockito.when(request.getParameter("login")).thenReturn("test-login");
+        Mockito.when(request.getParameter("email")).thenReturn("test-email");
         Mockito.when(ds.getConnection()).thenReturn(null);
         Mockito.when(dbManager.editEntry(any(), any(), any(), any())).thenReturn(true);
 
         editUserServlet.doPost(request, response);
-        assertThat(sw.toString(), is("edit user login"));
+        assertThat(sw.toString(), is("edit user test-login"));
     }
 }

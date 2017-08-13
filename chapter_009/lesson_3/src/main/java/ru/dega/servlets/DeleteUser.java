@@ -1,7 +1,6 @@
 package ru.dega.servlets;
 
 import ru.dega.DBManager;
-import ru.dega.HtmlBodyParse;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -14,7 +13,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Map;
 
 /**
  * DeleteUser class.
@@ -106,12 +104,9 @@ public class DeleteUser extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setContentType("text/html");
-        Map<String, String> userData = HtmlBodyParse.getLoginDataFromRequestBody(req);
         PrintWriter printWriter = new PrintWriter(resp.getWriter());
-        if (userData.size() == 1) {
-            if (this.dbManager.deleteEntry(getConnection(), userData.get("login"))) {
-                printWriter.append(String.format("delete user %s", userData.get("login")));
-            }
+        if (this.dbManager.deleteEntry(getConnection(), req.getParameter("login"))) {
+            printWriter.append(String.format("delete user %s", req.getParameter("login")));
         } else {
             printWriter.append("not enough data to delete user");
         }

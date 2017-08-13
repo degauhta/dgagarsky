@@ -1,7 +1,6 @@
 package ru.dega.servlets;
 
 import ru.dega.DBManager;
-import ru.dega.HtmlBodyParse;
 import ru.dega.models.User;
 
 import javax.naming.InitialContext;
@@ -15,7 +14,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Map;
 
 /**
  * CreateUser class.
@@ -109,13 +107,10 @@ public class CreateUser extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setContentType("text/html");
-        Map<String, String> userData = HtmlBodyParse.getLoginDataFromRequestBody(req);
         PrintWriter printWriter = new PrintWriter(resp.getWriter());
-        if (userData.size() == 3) {
-            if (this.dbManager.addEntry(getConnection(), new User(userData.get("name"),
-                    userData.get("login"), userData.get("email")))) {
-                printWriter.append(String.format("create user %s", userData.get("login")));
-            }
+        if (this.dbManager.addEntry(getConnection(), new User(req.getParameter("name"),
+                req.getParameter("login"), req.getParameter("email")))) {
+            printWriter.append(String.format("create user %s", req.getParameter("login")));
         } else {
             printWriter.append("not enough data to create user");
         }
