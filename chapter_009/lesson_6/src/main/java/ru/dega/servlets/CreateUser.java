@@ -1,0 +1,60 @@
+package ru.dega.servlets;
+
+import ru.dega.DBManager;
+import ru.dega.models.User;
+import ru.dega.models.UserRole;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.time.LocalDateTime;
+
+/**
+ * CreateUser class.
+ *
+ * @author Denis
+ * @since 11.08.2017
+ */
+public class CreateUser extends HttpServlet {
+    /**
+     * Allow a servlet to handle a POST request.
+     * The HTTP POST method allows the client to send data
+     * of unlimited length to the Web server a single time
+     * and is useful when posting information such as credit card numbers.
+     *
+     * @param req  request
+     * @param resp response
+     * @throws ServletException error
+     * @throws IOException      error
+     */
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setContentType("text/html");
+        boolean result = false;
+        String error = "Not unique login!";
+        HttpSession session = req.getSession();
+        synchronized (session) {
+            if (session.getAttribute("role") == UserRole.ADMINISTRATOR) {
+                result = DBManager.getInstance().addEntry(new User(req.getParameter("login"),
+                        req.getParameter("password"),
+                        req.getParameter("name"),
+                        req.getParameter("email"),
+                        LocalDateTime.now(),
+                        UserRole.valueOf(req.getParameter("role"))));
+            } else {
+                error = "User cant create new users/admins";
+            }
+        }
+        if (result) {
+            resp.sendRedirect(String.format("%s/", req.getContextPath()));
+        } else {
+            req.setAttribute("error", error);
+            req.setAttribute("users", DBManager.getInstance().getAllEntries());
+            req.setAttribute("roles", UserRole.values());
+            req.getRequestDispatcher("/WEB-INF/views/UsersView.jsp").forward(req, resp);
+        }
+    }
+}
