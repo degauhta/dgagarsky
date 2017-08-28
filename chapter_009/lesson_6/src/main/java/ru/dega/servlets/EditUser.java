@@ -35,15 +35,13 @@ public class EditUser extends HttpServlet {
         String error = "";
         if (!editedLogin.equals("root")) {
             HttpSession session = req.getSession();
-            synchronized (session) {
-                if (session.getAttribute("role") == UserRole.ADMINISTRATOR
-                        || session.getAttribute("login").equals(editedLogin)) {
-                    DBManager.getInstance().editEntry(req.getParameter("login"),
-                            req.getParameter("name"), req.getParameter("email"));
-                    resp.sendRedirect(String.format("%s/", req.getContextPath()));
-                } else {
-                    error = "User can edit only themselves!";
-                }
+            if (session.getAttribute("role") == UserRole.ADMINISTRATOR
+                    || session.getAttribute("login").equals(editedLogin)) {
+                DBManager.getInstance().editEntry(req.getParameter("login"),
+                        req.getParameter("name"), req.getParameter("email"));
+                resp.sendRedirect(String.format("%s/", req.getContextPath()));
+            } else {
+                error = "User can edit only themselves!";
             }
         } else {
             error = "Cant edit user root!";

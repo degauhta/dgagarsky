@@ -4,12 +4,12 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.mock.jndi.SimpleNamingContextBuilder;
 import ru.dega.models.UserRole;
 
 import javax.naming.NamingException;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -25,7 +25,11 @@ import java.sql.DriverManager;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * CreateUserTest class.
@@ -107,28 +111,28 @@ public class CreateUserTest {
     }
 
     /**
-     * Test post.
+     * Role is administrator.
      *
      * @throws ServletException error
      * @throws IOException      error
      * @throws SQLException     error
      */
     @Test
-    public void testPost() throws ServletException, IOException, SQLException {
+    public void whenUserHaveAdministratorRoleThenCreateEntry() throws ServletException, IOException, SQLException {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
         HttpSession session = mock(HttpSession.class);
         CreateUser createUserServlet = new CreateUser();
 
-        Mockito.when(request.getSession()).thenReturn(session);
-        Mockito.when(session.getAttribute("role")).thenReturn(UserRole.ADMINISTRATOR);
+        when(request.getSession()).thenReturn(session);
+        when(session.getAttribute("role")).thenReturn(UserRole.ADMINISTRATOR);
 
-        Mockito.when(request.getParameter("name")).thenReturn("test-name");
-        Mockito.when(request.getParameter("password")).thenReturn("test-password");
-        Mockito.when(request.getParameter("login")).thenReturn("test-login");
-        Mockito.when(request.getParameter("email")).thenReturn("test-email");
-        Mockito.when(request.getParameter("role")).thenReturn("ADMINISTRATOR");
-        Mockito.when(request.getContextPath()).thenReturn("");
+        when(request.getParameter("name")).thenReturn("test-name");
+        when(request.getParameter("password")).thenReturn("test-password");
+        when(request.getParameter("login")).thenReturn("test-login");
+        when(request.getParameter("email")).thenReturn("test-email");
+        when(request.getParameter("role")).thenReturn("ADMINISTRATOR");
+        when(request.getContextPath()).thenReturn("");
 
         createUserServlet.doPost(request, response);
 
@@ -143,5 +147,30 @@ public class CreateUserTest {
                 assertThat(rs.getString("role"), is("ADMINISTRATOR"));
             }
         }
+    }
+
+    /**
+     * Role not administrator.
+     *
+     * @throws ServletException error
+     * @throws IOException      error
+     * @throws SQLException     error
+     */
+    @Test
+    public void whenUserNotAdministratorThenReturnError() throws ServletException, IOException, SQLException {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        HttpSession session = mock(HttpSession.class);
+        RequestDispatcher dispatcher = mock(RequestDispatcher.class);
+        CreateUser createUserServlet = new CreateUser();
+
+        when(request.getSession()).thenReturn(session);
+        when(session.getAttribute("role")).thenReturn(UserRole.USER);
+        when(request.getRequestDispatcher(any())).thenReturn(dispatcher);
+
+        createUserServlet.doPost(request, response);
+
+        verify(request, atLeastOnce()).setAttribute("error", "User cant create new users/admins");
+        verify(dispatcher, atLeastOnce()).forward(request, response);
     }
 }

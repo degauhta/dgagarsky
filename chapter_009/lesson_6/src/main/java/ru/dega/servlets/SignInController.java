@@ -48,10 +48,8 @@ public class SignInController extends HttpServlet {
         if (DBManager.getInstance().isCredential(login, password)) {
             UserRole role = DBManager.getInstance().getUserRole(login);
             HttpSession session = req.getSession();
-            synchronized (session) {
-                session.setAttribute("login", login);
-                session.setAttribute("role", role);
-            }
+            session.setAttribute("login", login);
+            session.setAttribute("role", role);
             resp.sendRedirect(String.format("%s/", req.getContextPath()));
         } else {
             req.setAttribute("error", "Credential invalid!");

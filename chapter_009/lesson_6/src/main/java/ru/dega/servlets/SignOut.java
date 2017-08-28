@@ -41,9 +41,7 @@ public class SignOut extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         HttpSession session = req.getSession();
-        synchronized (session) {
-            session.invalidate();
-        }
+        session.invalidate();
         resp.sendRedirect(String.format("%s/", req.getContextPath()));
     }
 }

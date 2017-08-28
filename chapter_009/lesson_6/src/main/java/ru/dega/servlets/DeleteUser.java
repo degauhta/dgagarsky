@@ -35,19 +35,17 @@ public class DeleteUser extends HttpServlet {
         String error = "";
         if (!deletedLogin.equals("root")) {
             HttpSession session = req.getSession();
-            synchronized (session) {
-                boolean sameUser = session.getAttribute("login").equals(deletedLogin);
-                if (session.getAttribute("role") == UserRole.ADMINISTRATOR
-                        || sameUser) {
-                    DBManager.getInstance().deleteEntry(req.getParameter("login"));
-                    if (sameUser) {
-                        resp.sendRedirect(String.format("%s/signout", req.getContextPath()));
-                    } else {
-                        resp.sendRedirect(String.format("%s/", req.getContextPath()));
-                    }
+            boolean sameUser = session.getAttribute("login").equals(deletedLogin);
+            if (session.getAttribute("role") == UserRole.ADMINISTRATOR
+                    || sameUser) {
+                DBManager.getInstance().deleteEntry(req.getParameter("login"));
+                if (sameUser) {
+                    resp.sendRedirect(String.format("%s/signout", req.getContextPath()));
                 } else {
-                    error = "User can delete only themselves!";
+                    resp.sendRedirect(String.format("%s/", req.getContextPath()));
                 }
+            } else {
+                error = "User can delete only themselves!";
             }
         } else {
             error = "Cant delete user root!";

@@ -4,12 +4,12 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.mock.jndi.SimpleNamingContextBuilder;
 import ru.dega.models.UserRole;
 
 import javax.naming.NamingException;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,7 +24,11 @@ import java.sql.Statement;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * EditUserTest class.
@@ -75,7 +79,7 @@ public class EditUserTest {
                     + "NAME TEXT, EMAIL TEXT, CREATEDATE TIMESTAMP, ROLE TEXT)");
             connection.commit();
             statement.execute("INSERT INTO USERS (LOGIN, PASSWORD, NAME, EMAIL, CREATEDATE, ROLE) "
-                    + "VALUES ('test-login', 'test-password', 'test-name', 'email', null, 'USER')");
+                    + "VALUES ('test-login', 'test-password', 'test-name', 'email', '2017-01-01 00:00:00', 'USER')");
             connection.commit();
         }
     }
@@ -109,6 +113,28 @@ public class EditUserTest {
     }
 
     /**
+     * Edit root.
+     *
+     * @throws ServletException error
+     * @throws IOException      error
+     * @throws SQLException     error
+     */
+    @Test
+    public void whenTryToEditRootTherReturnError() throws ServletException, IOException, SQLException {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        RequestDispatcher dispatcher = mock(RequestDispatcher.class);
+        EditUser editUserServlet = new EditUser();
+
+        when(request.getParameter("login")).thenReturn("root");
+        when(request.getRequestDispatcher(any())).thenReturn(dispatcher);
+        editUserServlet.doPost(request, response);
+
+        verify(request, atLeastOnce()).setAttribute("error", "Cant edit user root!");
+        verify(dispatcher, atLeastOnce()).forward(request, response);
+    }
+
+    /**
      * Test post.
      *
      * @throws ServletException error
@@ -116,19 +142,19 @@ public class EditUserTest {
      * @throws SQLException     error
      */
     @Test
-    public void testPost() throws ServletException, IOException, SQLException {
+    public void whenAdministratorEditThenEntryEdited() throws ServletException, IOException, SQLException {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
         HttpSession session = mock(HttpSession.class);
         EditUser editUserServlet = new EditUser();
 
-        Mockito.when(request.getParameter("login")).thenReturn("test-login");
-        Mockito.when(request.getSession()).thenReturn(session);
-        Mockito.when(session.getAttribute("login")).thenReturn("test-login");
-        Mockito.when(session.getAttribute("role")).thenReturn(UserRole.ADMINISTRATOR);
-        Mockito.when(request.getParameter("name")).thenReturn("new-name");
-        Mockito.when(request.getParameter("email")).thenReturn("new-email");
-        Mockito.when(request.getContextPath()).thenReturn("");
+        when(request.getParameter("login")).thenReturn("test-login");
+        when(request.getSession()).thenReturn(session);
+        when(session.getAttribute("login")).thenReturn("test-login");
+        when(session.getAttribute("role")).thenReturn(UserRole.ADMINISTRATOR);
+        when(request.getParameter("name")).thenReturn("new-name");
+        when(request.getParameter("email")).thenReturn("new-email");
+        when(request.getContextPath()).thenReturn("");
 
         editUserServlet.doPost(request, response);
 
@@ -139,5 +165,31 @@ public class EditUserTest {
                 assertThat(rs.getString("email"), is("new-email"));
             }
         }
+    }
+
+    /**
+     * User try edit user.
+     *
+     * @throws ServletException error
+     * @throws IOException      error
+     * @throws SQLException     error
+     */
+    @Test
+    public void whenUserTryToEditOtherUserTherReturnError() throws ServletException, IOException, SQLException {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        HttpSession session = mock(HttpSession.class);
+        RequestDispatcher dispatcher = mock(RequestDispatcher.class);
+        EditUser editUserServlet = new EditUser();
+
+        when(request.getParameter("login")).thenReturn("other-login");
+        when(request.getSession()).thenReturn(session);
+        when(session.getAttribute("login")).thenReturn("test-login");
+        when(session.getAttribute("role")).thenReturn(UserRole.USER);
+        when(request.getRequestDispatcher(any())).thenReturn(dispatcher);
+        editUserServlet.doPost(request, response);
+
+        verify(request, atLeastOnce()).setAttribute("error", "User can edit only themselves!");
+        verify(dispatcher, atLeastOnce()).forward(request, response);
     }
 }

@@ -36,17 +36,15 @@ public class CreateUser extends HttpServlet {
         boolean result = false;
         String error = "Not unique login!";
         HttpSession session = req.getSession();
-        synchronized (session) {
-            if (session.getAttribute("role") == UserRole.ADMINISTRATOR) {
-                result = DBManager.getInstance().addEntry(new User(req.getParameter("login"),
-                        req.getParameter("password"),
-                        req.getParameter("name"),
-                        req.getParameter("email"),
-                        LocalDateTime.now(),
-                        UserRole.valueOf(req.getParameter("role"))));
-            } else {
-                error = "User cant create new users/admins";
-            }
+        if (session.getAttribute("role") == UserRole.ADMINISTRATOR) {
+            result = DBManager.getInstance().addEntry(new User(req.getParameter("login"),
+                    req.getParameter("password"),
+                    req.getParameter("name"),
+                    req.getParameter("email"),
+                    LocalDateTime.now(),
+                    UserRole.valueOf(req.getParameter("role"))));
+        } else {
+            error = "User cant create new users/admins";
         }
         if (result) {
             resp.sendRedirect(String.format("%s/", req.getContextPath()));
