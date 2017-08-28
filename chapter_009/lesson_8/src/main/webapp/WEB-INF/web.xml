@@ -1,0 +1,91 @@
+<web-app>
+    <filter>
+        <filter-name>AuthFilter</filter-name>
+        <filter-class>ru.dega.servlets.AuthFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>AuthFilter</filter-name>
+        <url-pattern>*</url-pattern>
+    </filter-mapping>
+
+    <servlet>
+        <servlet-name>SignInController</servlet-name>
+        <servlet-class>ru.dega.servlets.SignInController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>SignInController</servlet-name>
+        <url-pattern>/signin</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>SignOut</servlet-name>
+        <servlet-class>ru.dega.servlets.SignOut</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>SignOut</servlet-name>
+        <url-pattern>/signout</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>JSONSession</servlet-name>
+        <servlet-class>ru.dega.servlets.JSONSession</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>JSONSession</servlet-name>
+        <url-pattern>/jsonsession</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>JSONController</servlet-name>
+        <servlet-class>ru.dega.servlets.JSONController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>JSONController</servlet-name>
+        <url-pattern>/json</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>JSONUserRole</servlet-name>
+        <servlet-class>ru.dega.servlets.JSONEnum</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>JSONUserRole</servlet-name>
+        <url-pattern>/jsonrole</url-pattern>
+    </servlet-mapping>
+
+
+    <servlet>
+        <servlet-name>CreateUser</servlet-name>
+        <servlet-class>ru.dega.servlets.CreateUser</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CreateUser</servlet-name>
+        <url-pattern>/createuser</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>DeleteUser</servlet-name>
+        <servlet-class>ru.dega.servlets.DeleteUser</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>DeleteUser</servlet-name>
+        <url-pattern>/deleteuser</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>EditUser</servlet-name>
+        <servlet-class>ru.dega.servlets.EditUser</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>EditUser</servlet-name>
+        <url-pattern>/edituser</url-pattern>
+    </servlet-mapping>
+
+
+    <resource-ref>
+        <description>DB Connection</description>
+        <res-ref-name>jdbc/mvc</res-ref-name>
+        <res-type>javax.sql.DataSource</res-type>
+        <res-auth>Container</res-auth>
+    </resource-ref>
+</web-app>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit user</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $("#password")[0].value = $.cookie("password");
+            $("#name")[0].value = $.cookie("name");
+            $("#email")[0].value = $.cookie("email");
+            $("#country")[0].value = $.cookie("country");
+            $("#town")[0].value = $.cookie("town");
+        });
+
+        $(document).on("click", "#singlebutton", function () {
+            $.ajax({
+                url: "./edituser",
+                method: 'post',
+                dataType: 'text',
+                data: {
+                    editedLogin: $.cookie("editedLogin"),
+                    name: document.getElementById("name").value,
+                    email: document.getElementById("email").value,
+                    country: document.getElementById("country").value,
+                    town: document.getElementById("town").value
+                },
+                success: function (data) {
+                    if (data.indexOf("Error") > 0) {
+                        $("#error_message").text(data);
+                    } else {
+                        window.location.replace(data);
+                    }
+                },
+                error: function (exception) {
+                    console.log('Exception:' + exception);
+                }
+            });
+            return false;
+        });
+    </script>
+
+</head>
+<body>
+
+<form class="form-horizontal">
+    <fieldset>
+
+        <legend id='user_login' align="center"></legend>
+
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="password">New password</label>
+            <div class="col-md-4">
+                <input id="password" name="password" type="password" class="form-control input-md">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="name">New name</label>
+            <div class="col-md-4">
+                <input id="name" name="name" type="text" class="form-control input-md">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="email">New email</label>
+            <div class="col-md-4">
+                <input id="email" name="email" type="text" class="form-control input-md">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="email">New country</label>
+            <div class="col-md-4">
+                <input id="country" name="country" type="text" class="form-control input-md">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="email">New town</label>
+            <div class="col-md-4">
+                <input id="town" name="town" type="text" class="form-control input-md">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="singlebutton"></label>
+            <div class="col-md-4">
+                <button id="singlebutton" name="singlebutton" class="btn btn-primary">
+                    Edit
+                </button>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div id="error_message" class="col-md-4">
+            </div>
+        </div>
+
+    </fieldset>
+</form>
+
+</body>
+</html>
