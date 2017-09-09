@@ -1,0 +1,89 @@
+<web-app>
+    <servlet>
+        <servlet-name>UsersView</servlet-name>
+        <servlet-class>ru.dega.servlets.UsersView</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>UsersView</servlet-name>
+        <url-pattern></url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>UsersJSON</servlet-name>
+        <servlet-class>ru.dega.servlets.UsersJSON</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>UsersJSON</servlet-name>
+        <url-pattern>/usersjson</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>CreateUser</servlet-name>
+        <servlet-class>ru.dega.servlets.UserCreate</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CreateUser</servlet-name>
+        <url-pattern>/createuser</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>DeleteUser</servlet-name>
+        <servlet-class>ru.dega.servlets.UserDelete</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>DeleteUser</servlet-name>
+        <url-pattern>/deleteuser</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>UserEdit</servlet-name>
+        <servlet-class>ru.dega.servlets.UserEdit</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>UserEdit</servlet-name>
+        <url-pattern>/useredit</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>RoleCRUD</servlet-name>
+        <servlet-class>ru.dega.servlets.RoleCRUD</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>RoleCRUD</servlet-name>
+        <url-pattern>/role</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>MusicTypeCRUD</servlet-name>
+        <servlet-class>ru.dega.servlets.MusicTypeCRUD</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>MusicTypeCRUD</servlet-name>
+        <url-pattern>/musictype</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>RoleJSON</servlet-name>
+        <servlet-class>ru.dega.servlets.RoleJSON</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>RoleJSON</servlet-name>
+        <url-pattern>/rolejson</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>MusicTypeJSON</servlet-name>
+        <servlet-class>ru.dega.servlets.MusicTypeJSON</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>MusicTypeJSON</servlet-name>
+        <url-pattern>/musictypejson</url-pattern>
+    </servlet-mapping>
+
+    <resource-ref>
+        <description>DB Connection</description>
+        <res-ref-name>jdbc/mvc</res-ref-name>
+        <res-type>javax.sql.DataSource</res-type>
+        <res-auth>Container</res-auth>
+    </resource-ref>
+</web-app>

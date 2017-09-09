@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DAO</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" rel='stylesheet'
+          type='text/css'>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <link href="/resources/css/style.css" rel="stylesheet" type="text/css"/>
+
+    <script>
+        jQuery.ajaxSetup({
+            cache: false
+        });
+
+        $(document).ready(function () {
+            printUsers();
+        });
+
+        function printUsers() {
+            $.ajax('./usersjson', {
+                method: 'get', complete: function (data) {
+                    var result = "<thead>"
+                        + "<tr>"
+                        + "<th><em class='fa fa-cog'></em></th>"
+                        + "<th style='display: none'>ID</th>"
+                        + "<th>Login</th>"
+                        + "<th style='display: none'>RoleID</th>"
+                        + "<th>Role</th>"
+                        + "<th style='display: none'>AddressID</th>"
+                        + "<th>Address</th>"
+                        + "<th style='display: none'>MusicID</th>"
+                        + "<th>Music</th>"
+                        + "</tr>"
+                        + "</thead>"
+                        + "<tbody>";
+                    var users = JSON.parse(data.responseText);
+                    for (var i = 0; i != users.length; ++i) {
+                        result += "<tr>"
+                            + "<td align='center'>"
+                            + "<a class='btn btn-default' "
+                            + "onclick='editUser($(this).parent().next().next().html(),"
+                            + "$(this).parent().next().next().next().next().next().next().next().html());'>"
+                            + "<em class='fa fa-pencil'></em></a>"
+                            + "<a class='btn btn-danger' onclick='deleteUser($(this).parent().next().html());return false'><em class='fa fa-trash'></em></a>"
+                            + "</td>"
+                            + "<td style='display: none'>" + users[i].userid + "</td>"
+                            + "<td>" + users[i].userlogin + "</td>"
+                            + "<td style='display: none'>" + users[i].roleid + "</td>"
+                            + "<td>" + users[i].rolename + "</td>"
+                            + "<td style='display: none'>" + users[i].adrid + "</td>"
+                            + "<td>" + users[i].adrrepr + "</td>"
+                            + "<td style='display: none'>" + users[i].musicid + "</td>"
+                            + "<td>" + users[i].music + "</td>"
+                            + "</tr>";
+                    }
+                    result += "</tbody>";
+                    var table = document.getElementById("users");
+                    table.innerHTML = result;
+                }
+            });
+        }
+
+        function editUser(trName, trMusicId) {
+            location.href = 'useredit?editedName=' + trName + '&musicId=' + trMusicId;
+        }
+
+        function deleteUser(id) {
+            $.ajax({
+                url: "./deleteuser",
+                method: 'post',
+                dataType: 'text',
+                data: {
+                    id: id
+                },
+                success: function (data) {
+                    if (data === "true") {
+                        printUsers();
+                    }
+                },
+                error: function (exception) {
+                    console.log('Exception:' + exception);
+                }
+            });
+        }
+
+
+    </script>
+</head>
+
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+            <div class="panel panel-default panel-table">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col col-xs-6">
+                            <h3 class="panel-title">Users</h3>
+                        </div>
+                        <div class="col col-xs-6 text-right">
+                            <button type="button" onclick="location.href = 'createuser'"
+                                    class="btn btn-sm btn-primary btn-create">New user
+                            </button>
+                            <button type="button" onclick="location.href = 'role'"
+                                    class="btn btn-sm btn-success">
+                                Add role
+                            </button>
+                            <button type="button" onclick="location.href = 'musictype'"
+                                    class="btn btn-sm btn-success">
+                                Add music type
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <table class="table table-striped table-bordered table-list" id="users">
+                    </table>
+                </div>
+                <div class="panel-footer">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+
+</html>

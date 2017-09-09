@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Role</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" rel='stylesheet'
+          type='text/css'>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link href="/resources/css/style.css" rel="stylesheet" type="text/css"/>
+
+    <script>
+        var editedName = null;
+
+        jQuery.ajaxSetup({
+            cache: false
+        });
+
+        $(document).ready(function () {
+            printRoles();
+        });
+
+        function printRoles() {
+            $.get("./rolejson",
+                function (data) {
+                    var result = "<thead>"
+                        + "<tr>"
+                        + "<th><em class='fa fa-cog'></em></th>"
+                        + "<th style='display: none'>ID</th>"
+                        + "<th>Name</th>"
+                        + "</tr>"
+                        + "</thead>"
+                        + "<tbody>";
+                    $.each(data, function (key, value) {
+                        result += "<tr>"
+                            + "<td align='center'>"
+                            + "<a class='btn btn-default' "
+                            + "onclick='editRole($(this).parent().next().next().html(), $(this).parent().next().html());'>"
+                            + "<em class='fa fa-pencil'></em></a>"
+                            + "<a class='btn btn-danger' "
+                            + "onclick='deleteRole($(this).parent().next().next().html());return false'>"
+                            + "<em class='fa fa-trash'></em></a>"
+                            + "</td>"
+                            + "<td style='display: none'>" + key + "</td>"
+                            + "<td>" + value + "</td>"
+                            + "</tr>";
+                    });
+                    result += "</tbody>";
+                    var table = document.getElementById("roles");
+                    table.innerHTML = result;
+                });
+        }
+
+        function create() {
+            editedName = null;
+            $("#username_message").text("");
+            $.ajax({
+                url: "./role",
+                method: 'post',
+                dataType: 'json',
+                data: {
+                    operationName: "create",
+                    name: document.getElementById("name").value
+                },
+                success: function (data) {
+                    if (data.error.length > 0) {
+                        $("#username_message").text(data.error);
+                    } else {
+                        printRoles();
+                    }
+                },
+                error: function (exception) {
+                    console.log('Exception:' + exception);
+                }
+            });
+        }
+
+        function deleteRole(tdName) {
+            editedName = null;
+            $("#username_message").text("");
+            $.ajax({
+                url: "./role",
+                method: 'post',
+                dataType: 'json',
+                data: {
+                    operationName: "delete",
+                    tdName: tdName
+                },
+                success: function (data) {
+                    if (data.error.length > 0) {
+                        $("#username_message").text(data.error);
+                    } else {
+                        printRoles();
+                    }
+                },
+                error: function (exception) {
+                    console.log('Exception:' + exception);
+                }
+            });
+        }
+
+        function editRole(tdName, tdId) {
+            if (editedName === tdName) {
+                $("#username_message").text("");
+                editedName = null;
+                $.ajax({
+                    url: "./role",
+                    method: 'post',
+                    dataType: 'json',
+                    data: {
+                        operationName: "update",
+                        tdName: tdName,
+                        tdId: tdId,
+                        name: document.getElementById("name").value
+                    },
+                    success: function (data) {
+                        if (data.error.length > 0) {
+                            $("#username_message").text(data.error);
+                        } else {
+                            printRoles();
+                        }
+                    },
+                    error: function (exception) {
+                        console.log('Exception:' + exception);
+                    }
+                });
+            } else {
+                $("#username_message").text("this name will update role name if you press pencil once again");
+                editedName = tdName;
+            }
+        }
+
+    </script>
+</head>
+<body>
+
+<form class="form-horizontal">
+    <fieldset>
+
+        <legend align="center">Role</legend>
+
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="name">Role name</label>
+            <div class="col-md-4">
+                <input id="name" name="name" type="text" placeholder="enter unique name"
+                       class="form-control input-md">
+                <span id="username_message" class="help-block"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="createuser"></label>
+            <div class="col-md-4" align="center">
+                <button id="createuser" class="btn btn-primary" onclick="create(); return false;">
+                    New user
+                </button>
+            </div>
+        </div>
+
+    </fieldset>
+</form>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+            <div class="panel panel-default panel-table">
+                <div class="panel-heading">
+                    <div class="row">
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <table class="table table-striped table-bordered table-list" id="roles">
+                    </table>
+                </div>
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col col-xs-6">
+                        </div>
+                        <div class="col col-xs-6 text-right">
+                            <button class="btn btn-sm btn-success"
+                                    onclick="location.href='/'; return false;">Go to main page
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

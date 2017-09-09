@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit user</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $(function () {
+                $.get("./rolejson",
+                    function (responseJson) {
+                        var $select = $("#role");
+                        $select.find("option").remove();
+                        $.each(responseJson, function (key, value) {
+                            $("<option>").val(key).text(value).appendTo($select);
+                        });
+                    });
+                $.get("./musictypejson",
+                    function (responseJson) {
+                        var $select = $("#musictypes");
+                        $select.find("option").remove();
+                        $.each(responseJson, function (key, value) {
+                            $("<option>").val(key).text(value).appendTo($select);
+                        });
+                    });
+            });
+
+//            $(window).on('load', function () {
+//            $(document).ready(function () {
+            $(function () {
+                $(function () {
+                    $("#login")[0].value = $.cookie("userName");
+                    if ($.cookie("addressRepresentation") != undefined) {
+                        $("#address")[0].value = $.cookie("addressRepresentation");
+                    }
+                    if ($.cookie("roleId") != undefined) {
+                        $("#role").val($.cookie("roleId"));
+                    }
+                    var musicId = $.cookie("musicId");
+                    if (musicId != undefined) {
+                        $('#musictypes').val(musicId.split(','));
+                    }
+                });
+            });
+
+        });
+
+        function editUser() {
+            //var role_id = $('#role').find('option:selected').val();
+            $.ajax({
+                url: "./useredit",
+                method: 'post',
+                dataType: 'json',
+                data: {
+                    login : $.cookie("userName"),
+                    newLogin: document.getElementById("login").value,
+                    id: $.cookie("userID"),
+                    address: document.getElementById("address").value,
+                    roleId: $('#role').val(),
+                    musicID: $('#musictypes').val()
+                },
+                success: function (data) {
+                    if (data.error.length > 0) {
+                        $("#username_message").text(data.error);
+                    } else {
+                        window.location.replace(data.href);
+                    }
+                },
+                error: function (exception) {
+                    console.log('Exception:' + exception);
+                }
+            });
+        }
+    </script>
+
+</head>
+
+<body>
+
+<form class="form-horizontal">
+    <fieldset>
+
+        <legend align="center">User</legend>
+
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="login">Login</label>
+            <div class="col-md-4">
+                <input id="login" name="login" type="text" placeholder="enter unique login"
+                       class="form-control input-md">
+                <span id="username_message" class="help-block"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="address">Address</label>
+            <div class="col-md-4">
+                <input id="address" name="address" type="text" class="form-control input-md">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="musictypes">Music types</label>
+            <div class="col-md-4">
+                <select id="musictypes" name="musictypes" class="form-control" multiple="multiple">
+                    <option value="1">Option one</option>
+                    <option value="2">Option two</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="role">Role</label>
+            <div class="col-md-4">
+                <select id="role" name="role" class="form-control">
+                    <option value="1">Option one</option>
+                    <option value="2">Option two</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="createuser"></label>
+            <div class="col-md-4" align="center">
+                <button id="createuser" name="createuser" class="btn btn-lg btn-success"
+                        onclick="editUser(); return false;">
+                    Edit user
+                </button>
+            </div>
+        </div>
+
+    </fieldset>
+</form>
+</body>
+</html>
