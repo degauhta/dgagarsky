@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+    <session-factory>
+        <property name="hibernate.connection.url">jdbc:postgresql://127.0.0.1:5432/dega_hibernate_todo</property>
+        <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
+        <property name="hibernate.connection.username">postgres</property>
+        <property name="hibernate.connection.password">32167</property>
+        <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQL95Dialect</property>
+
+        <!--<property name="hibernate.connection.pool_size">1</property>-->
+        <!--<property name="hibernate.current_session_context_class">thread</property>-->
+        <!--<property name="hibernate.show_sql">true</property>-->
+        <!--<property name="hibernate.temp.use_jdbc_metadata_defaults">false</property>-->
+
+        <!--<property name="hibernate.connection.provider_class">org.hibernate.c3p0.internal.C3P0ConnectionProvider</property>-->
+        <!--<property name="hibernate.c3p0.acquire_increment">1</property>-->
+        <!--<property name="hibernate.c3p0.idle_test_period">0</property>-->
+        <!--<property name="hibernate.c3p0.min_size">1</property>-->
+        <!--<property name="hibernate.c3p0.max_size">2</property>-->
+        <!--<property name="hibernate.c3p0.timeout">0</property>-->
+
+        <!--config.setProperty("hibernate.connection.provider_class", "org.hibernate.connection.C3P0ConnectionProvider");-->
+
+        <!-- List of XML mapping files -->
+        <mapping resource="ru/dega/models/Item.hbm.xml"/>
+
+    </session-factory>
+</hibernate-configuration>

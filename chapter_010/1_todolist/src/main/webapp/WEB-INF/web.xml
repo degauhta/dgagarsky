@@ -1,0 +1,24 @@
+<web-app>
+    <listener>
+        <listener-class>ru.dega.servlets.Clear</listener-class>
+    </listener>
+
+    <servlet>
+        <servlet-name>Items</servlet-name>
+        <servlet-class>ru.dega.servlets.view.Items</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Items</servlet-name>
+        <url-pattern></url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>ItemsJSON</servlet-name>
+        <servlet-class>ru.dega.servlets.ItemsJSON</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ItemsJSON</servlet-name>
+        <url-pattern>/itemsjson</url-pattern>
+    </servlet-mapping>
+
+</web-app>

@@ -1,0 +1,13 @@
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.dega.models.Item" table="ITEMS">
+        <id name="id" column="ID">
+            <generator class="identity"/>
+        </id>
+        <property name="description" column="DESCRIPTION" update="false"/>
+        <property name="created" column="CREATE_DATE" update="false"/>
+        <property name="done" column="DONE"/>
+    </class>
+</hibernate-mapping>
