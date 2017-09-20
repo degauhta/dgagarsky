@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+
+    <script>
+        jQuery(document).ready(function () {
+            $.get("./newadrertjson",
+                {select: "car brand"},
+                function (responseJson) {
+                    var $select = $("#carBrand");
+                    $select.find("option").remove();
+                    $.each(responseJson, function (key, value) {
+                        $("<option>").val(key).text(value).appendTo($select);
+                    });
+                });
+            $.get("./newadrertjson",
+                {select: "car model"},
+                function (responseJson) {
+                    var $select = $("#carModel");
+                    $select.find("option").remove();
+                    $.each(responseJson, function (key, value) {
+                        $("<option>").val(key).text(value).appendTo($select);
+                    });
+                });
+            $.get("./newadrertjson",
+                {select: "car body"},
+                function (responseJson) {
+                    var $select = $("#carBody");
+                    $select.find("option").remove();
+                    $.each(responseJson, function (key, value) {
+                        $("<option>").val(key).text(value).appendTo($select);
+                    });
+                });
+            $.get("./newadrertjson",
+                {select: "car transmission"},
+                function (responseJson) {
+                    var $select = $("#carTransmission");
+                    $select.find("option").remove();
+                    $.each(responseJson, function (key, value) {
+                        $("<option>").val(key).text(value).appendTo($select);
+                    });
+                });
+            $.get("./newadrertjson",
+                {select: "car engine"},
+                function (responseJson) {
+                    var $select = $("#carEngine");
+                    $select.find("option").remove();
+                    $.each(responseJson, function (key, value) {
+                        $("<option>").val(key).text(value).appendTo($select);
+                    });
+                });
+            $.get("./newadrertjson",
+                {select: "car drive type"},
+                function (responseJson) {
+                    var $select = $("#carDriveType");
+                    $select.find("option").remove();
+                    $.each(responseJson, function (key, value) {
+                        $("<option>").val(key).text(value).appendTo($select);
+                    });
+                });
+        });
+    </script>
+</head>
+
+<body>
+<form class="form-horizontal" method="post" enctype="multipart/form-data">
+    <fieldset>
+        <legend align="center">Place your FREE advert today</legend>
+
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="description">Description</label>
+            <div class="col-md-4">
+                <textarea class="form-control input-lg" id="description" name="description"
+                          placeholder="enter advert description"></textarea>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="carBrand">Brand</label>
+            <div class="col-md-4">
+                <select id="carBrand" name="carBrand" class="form-control">
+                    <option value="1">Option one</option>
+                    <option value="2">Option two</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="carModel">Model</label>
+            <div class="col-md-4">
+                <select id="carModel" name="carModel" class="form-control">
+                    <option value="1">Option one</option>
+                    <option value="2">Option two</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="carBody">Body</label>
+            <div class="col-md-4">
+                <select id="carBody" name="carBody" class="form-control">
+                    <option value="1">Option one</option>
+                    <option value="2">Option two</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="carTransmission">Transmission</label>
+            <div class="col-md-4">
+                <select id="carTransmission" name="carTransmission" class="form-control">
+                    <option value="1">Option one</option>
+                    <option value="2">Option two</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="carEngine">Engine</label>
+            <div class="col-md-4">
+                <select id="carEngine" name="carEngine" class="form-control">
+                    <option value="1">Option one</option>
+                    <option value="2">Option two</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="carDriveType">Drive type</label>
+            <div class="col-md-4">
+                <select id="carDriveType" name="carDriveType" class="form-control">
+                    <option value="1">Option one</option>
+                    <option value="2">Option two</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="photo">Photo</label>
+            <div class="col-md-4">
+                <input id="photo" name="photo" class="input-file" type="file">
+            </div>
+        </div>
+    </fieldset>
+
+    <div class="form-group">
+        <div class="col-md-4 control-label">
+            <button type="submit" class="btn btn-lg btn-success">Submit</button>
+        </div>
+    </div>
+
+    <!--<button type="submit" class="btn btn-default">Submit</button>-->
+
+</form>
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.dega.models.Advertisement" table="ADVERTISEMENTS">
+        <id name="id" column="ID">
+            <generator class="identity"/>
+        </id>
+        <property name="description" column="DESCRIPTION"/>
+        <property name="sold" column="SOLD"/>
+        <property name="photo" column="photo"/>
+
+        <many-to-one name="carBrand" column="CAR_BRAND_ID"
+                     class="ru.dega.models.CarBrand" lazy="false"/> <!--not-null="true"/>-->
+
+        <many-to-one name="carModel" column="CAR_MODEL_ID"
+                     class="ru.dega.models.CarModel" lazy="false"/>
+
+        <many-to-one name="carBody" column="CAR_BODY_ID"
+                     class="ru.dega.models.CarBody" lazy="false"/>
+
+        <many-to-one name="carTransmission" column="CAR_TRANSMISSION_ID"
+                     class="ru.dega.models.CarTransmission" lazy="false"/>
+
+        <many-to-one name="carEngine" column="CAR_ENGINE_ID"
+                     class="ru.dega.models.CarEngine" lazy="false"/>
+
+        <many-to-one name="carDriveType" column="CAR_DRIVE_TYPE_ID"
+                     class="ru.dega.models.CarDriveType" lazy="false"/>
+
+        <many-to-one name="author" column="USER_ID"
+                     class="ru.dega.models.User" lazy="false"/> <!--not-null="true"/>-->
+
+    </class>
+</hibernate-mapping>

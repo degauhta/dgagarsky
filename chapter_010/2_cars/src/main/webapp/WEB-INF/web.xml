@@ -1,0 +1,70 @@
+<web-app>
+    <listener>
+        <listener-class>ru.dega.servlets.ContextListener</listener-class>
+    </listener>
+
+    <!--<filter>-->
+    <!--<filter-name>AuthFilter</filter-name>-->
+    <!--<filter-class>ru.dega.servlets.AuthFilter</filter-class>-->
+    <!--</filter>-->
+    <!--<filter-mapping>-->
+    <!--<filter-name>AuthFilter</filter-name>-->
+    <!--<url-pattern>*</url-pattern>-->
+    <!--</filter-mapping>-->
+
+    <servlet>
+        <servlet-name>Login</servlet-name>
+        <servlet-class>ru.dega.servlets.Login</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Login</servlet-name>
+        <url-pattern>/login</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>Logout</servlet-name>
+        <servlet-class>ru.dega.servlets.Logout</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Logout</servlet-name>
+        <url-pattern>/logout</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>Advertisements</servlet-name>
+        <servlet-class>ru.dega.servlets.views.Advertisements</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Advertisements</servlet-name>
+        <url-pattern></url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>AdvertisementJSON</servlet-name>
+        <servlet-class>ru.dega.servlets.json.AdvertisementJSON</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AdvertisementJSON</servlet-name>
+        <url-pattern>/advertjson</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>NewAdvert</servlet-name>
+        <servlet-class>ru.dega.servlets.NewAdvert</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>NewAdvert</servlet-name>
+        <url-pattern>/newadvert</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>NewAdvertJSON</servlet-name>
+        <servlet-class>ru.dega.servlets.json.NewAdvertJSON</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>NewAdvertJSON</servlet-name>
+        <url-pattern>/newadrertjson</url-pattern>
+    </servlet-mapping>
+
+
+</web-app>

@@ -13,6 +13,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>1_todolist</module>
+        <module>2_cars</module>
     </modules>
     <dependencies>
         <dependency>
