@@ -39,4 +39,12 @@ public interface AdvertisementDao {
      * @return true if status set successfully
      */
     boolean updateSoldStatus(int id);
+
+    /**
+     * Get filtered avert.
+     *
+     * @param filters filters
+     * @return list of advert
+     */
+    List<Advertisement> getFilteredAdvertisement(String[] filters);
 }

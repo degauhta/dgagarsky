@@ -15,37 +15,45 @@
     <script>
         $(document).ready(function () {
             var loginCookie = $.cookie("login");
-            printItems();
+            printItems(false, null);
             if (loginCookie === "null" || loginCookie == undefined) {
                 document.getElementById("buttonNewAdvert").disabled = true;
             } else {
                 document.getElementById('loginText').innerHTML = "<a href='/logout' id='loginText'>Log out</a>";
             }
         });
-        function printItems() {
+
+        function printItems(showall, filter) {
             $.ajax('./advertjson', {
                 method: 'get',
-                data: {'showAll': document.getElementById('checkboxes-0').checked},
+                data: {
+                    'showAll': showall,
+                    'filters': JSON.stringify(filter)
+                },
                 complete: function (data) {
                     var loginCookie = $.cookie("login");
                     var result = "<thead>"
-                        + "<tr>"
+                        + "<tr class='filters'>"
                         + "<th style='display: none'>Id</th>"
-                        + "<th>Photo</th>"
-                        + "<th>Description</th>"
-                        + "<th>Brand</th>"
-                        + "<th>Model</th>"
-                        + "<th>Body</th>"
-                        + "<th>Transmission</th>"
-                        + "<th>Engine</th>"
-                        + "<th>Drive type</th>"
-                        + "<th>Author</th>"
-                        + "<th>Sold</th>"
+                        + "<th id='filterBtn'>Photo</th>"
+                        + "<th><input type='text' class='form-control' placeholder='Description' disabled></th>"
+                        + "<th><input type='text' class='form-control' placeholder='Brand' disabled></th>"
+                        + "<th><input type='text' class='form-control' placeholder='Model' disabled></th>"
+                        + "<th><input type='text' class='form-control' placeholder='Body' disabled></th>"
+                        + "<th><input type='text' class='form-control' placeholder='Transmission' disabled></th>"
+                        + "<th><input type='text' class='form-control' placeholder='Engine' disabled></th>"
+                        + "<th><input type='text' class='form-control' placeholder='Drive type' disabled></th>"
+                        + "<th><input type='text' class='form-control' placeholder='Author' disabled></th>"
+                        + "<th>"
+                        + "<label for='checkboxes-0'>"
+                        + "<input type='checkbox' name='checkboxes' id='checkboxes-0' "
+                        + "onclick='printItems(($(this)).is(\":checked\"), null)'>"
+                        + "</label>"
+                        + "</th>"
                         + "</tr>"
                         + "</thead>"
                         + "<tbody>";
                     var users = JSON.parse(data.responseText);
-
                     var sold;
                     var photo;
                     for (var i = 0; i != users.length; ++i) {
@@ -81,6 +89,7 @@
                     result += "</tbody>";
                     var table = document.getElementById("advert");
                     table.innerHTML = result;
+                    document.getElementById('checkboxes-0').checked = showall;
                 }
             });
         }
@@ -93,7 +102,7 @@
                 },
                 success: function (data) {
                     if (data === "true") {
-                        printItems();
+                        printItems(document.getElementById('checkboxes-0').checked, false);
                     }
                 },
                 error: function (exception) {
@@ -101,79 +110,136 @@
                 }
             });
         }
+
+        function prepareFilters(filters) {
+            var arr = [];
+            for (var i = 2; i < 10; i++) {
+                arr.push(filters.find("th").eq(i).find("input").val().toLowerCase());
+            }
+            printItems(document.getElementById('checkboxes-0').checked, arr);
+        }
+
+        $(document).ready(function () {
+            $('.filterable .btn-filter').click(function () {
+                var $panel = $(this).parents('.filterable'),
+                    $filters = $panel.find('.filters input'),
+                    $tbody = $panel.find('.table tbody'),
+                    filterBtn = document.getElementById("filterBtn");
+                if ($filters.prop('disabled') == true) {
+                    $filters.prop('disabled', false);
+                    $filters.first().focus();
+                    filterBtn.innerHTML = "<button type='button' class='btn btn-success btn-sm' "
+                        + "onclick='prepareFilters($(this).parent().parent())' "
+                        + ">filter</button>";
+                } else {
+                    $filters.val('').prop('disabled', true);
+                    $tbody.find('.no-result').remove();
+                    $tbody.find('tr').show();
+                    filterBtn.innerHTML = "Photo";
+                }
+            });
+        });
     </script>
+
+    <style>
+        .filterable {
+            margin-top: 15px;
+        }
+
+        .filterable .panel-heading .pull-right {
+            margin-top: -20px;
+        }
+
+        .filterable .filters input[disabled] {
+            background-color: transparent;
+            border: none;
+            cursor: auto;
+            box-shadow: none;
+            padding: 0;
+            height: auto;
+        }
+
+        .filterable .filters input[disabled]::-webkit-input-placeholder {
+            color: #333;
+        }
+
+        .filterable .filters input[disabled]::-moz-placeholder {
+            color: #333;
+        }
+
+        .filterable .filters input[disabled]:-ms-input-placeholder {
+            color: #333;
+        }
+    </style>
 </head>
 
 <body>
-
-<form class="form-horizontal">
-    <div class="container">
-        <div class="row">
-            <p></p>
-            <!--<p id="username_message" align="right"></p>-->
-            <p align="right"><a href='/login.html' id="loginText">Log in</a></p>
-        </div>
-    </div>
-    <fieldset>
-        <legend align="center"></legend>
-        <div class="form-group">
-            <div class="col-md-4">
-                <button id="buttonNewAdvert" type="button" onclick="location.href = 'newadvert'"
-                        class="btn btn-lg btn-success pull-right">Place new advert
-                </button>
-            </div>
-        </div>
-    </fieldset>
-</form>
-
 <div class="container">
-    <div class="row">
-        <div class="col-md-10 col-md-offset-1">
-            <div class="panel panel-default panel-table">
-                <div class="panel-heading">
-                    <div class="row">
-                        <div class="col col-xs-6">
-                            <h1 class="panel-title"><b>My avito</b></h1>
-                        </div>
-                        <div class="col col-xs-6 text-right">
-                            <label for="checkboxes-0">
-                                <input type="checkbox" name="checkboxes" id="checkboxes-0"
-                                       value="1" onclick="printItems()">
-                                Show all
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <div class="panel-body">
-                    <table class="table table-striped table-bordered table-list" id="advert">
-                        <thead>
-                        <tr>
-                            <!--<th><em class='fa fa-cog'></em></th>-->
-                            <th style='display: none'>Id</th>
-                            <th>Description</th>
-                            <th>Brand</th>
-                            <th>Model</th>
-                            <th>Body</th>
-                            <th>Transmission</th>
-                            <th>Engine</th>
-                            <th>Drive type</th>
-                            <th>Author</th>
-                            <th>Sold</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                            <!--<td>desc</td>-->
-                            <!--<td>2017</td>-->
-                            <!--<td>-->
-                            <!--<input name="btSelectItem" type="checkbox" checked="checked">-->
-                            <!--</td>-->
-                        </tbody>
-                    </table>
-                </div>
-                <div class="panel-footer">
+    <form class="form-horizontal">
+        <div class="container">
+            <div class="row">
+                <p></p>
+                <p align="right"><a href='/login.html' id="loginText">Log in</a></p>
+            </div>
+        </div>
+        <fieldset>
+            <div class="form-group">
+                <div class="col-md-4">
+                    <button id="buttonNewAdvert" type="button" onclick="location.href = 'newadvert'"
+                            class="btn btn-lg btn-success">Place new advert
+                    </button>
                 </div>
             </div>
+        </fieldset>
+    </form>
+
+    <div class="row">
+        <div class="panel panel-primary filterable">
+            <div class="panel-heading">
+                <h3 class="panel-title">Users</h3>
+                <div class="pull-right">
+                    <button class="btn btn-default btn-xs btn-filter"><span class="glyphicon glyphicon-filter"></span>
+                        Filter
+                    </button>
+                </div>
+            </div>
+            <table class="table" id="advert">
+                <thead>
+                <tr class="filters">
+                    <th style='display: none'>Id</th>
+                    <th id="filterBtn">Photo</th>
+                    <th><input type="text" class="form-control" placeholder="Description" disabled></th>
+                    <th><input type="text" class="form-control" placeholder="Brand" disabled></th>
+                    <th><input type="text" class="form-control" placeholder="Model" disabled></th>
+                    <th><input type="text" class="form-control" placeholder="Body" disabled></th>
+                    <th><input type="text" class="form-control" placeholder="Transmission" disabled></th>
+                    <th><input type="text" class="form-control" placeholder="Engine" disabled></th>
+                    <th><input type="text" class="form-control" placeholder="Drive type" disabled></th>
+                    <th><input type="text" class="form-control" placeholder="Author" disabled></th>
+                    <th>
+                        <label for="checkboxes-0">
+                            <input type="checkbox" name="checkboxes" id="checkboxes-0" value="1"
+                                   onclick='printItems($(this).val($(this).checked))'>
+                        </label>
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td style='display: none'>Id</td>
+                    <td></td>
+                    <td>Description 1</td>
+                    <td>Brand 1</td>
+                    <td>Model 1</td>
+                    <td>@Body 1</td>
+                    <td>Transmission 1</td>
+                    <td>Engine 1</td>
+                    <td>Drive type 1</td>
+                    <td>Author 1</td>
+                    <td>Sold</td>
+                </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>

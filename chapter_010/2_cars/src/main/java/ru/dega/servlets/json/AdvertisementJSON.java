@@ -34,8 +34,12 @@ public class AdvertisementJSON extends HttpServlet {
         AdvertisementDao advertisementDao = new AdvertisementHibernateDao();
         resp.setContentType("text/json");
         PrintWriter writer = new PrintWriter(resp.getWriter());
+        String[] filters = new Gson()
+                .fromJson(req.getParameter("filters"), String[].class);
         List<Advertisement> list;
-        if (req.getParameter("showAll").equals("true")) {
+        if (filters != null) {
+            list = advertisementDao.getFilteredAdvertisement(filters);
+        } else if (req.getParameter("showAll").equals("true")) {
             list = advertisementDao.getAllAdvertisement();
         } else {
             list = advertisementDao.getAllNotSoldAdvertisement();
