@@ -45,10 +45,10 @@ public class AdvertDAO {
             advert.setCarBrand(carBrand);
             arrayList.add(advert);
         }
-        List<Advert> test =
-                jdbcTemplate.query(
-                        "SELECT ad.ADVERTISEMENT_ID as id, ad.DESCRIPTION as description, ad.CAR_BRAND_ID as carBrand FROM ADVERTISEMENTS ad",
-                        new BeanPropertyRowMapper(Advert.class));
+//        List<Advert> test =
+//                jdbcTemplate.query(
+//                        "SELECT ad.ADVERTISEMENT_ID as id, ad.DESCRIPTION as description, ad.CAR_BRAND_ID as carBrand FROM ADVERTISEMENTS ad",
+//                        new BeanPropertyRowMapper(Advert.class));
         return arrayList;
     }
 

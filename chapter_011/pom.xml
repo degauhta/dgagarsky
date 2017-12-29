@@ -15,6 +15,7 @@
 
         <module>1_ioc</module>
         <module>2_mvc</module>
+        <module>3_springdata</module>
     </modules>
 
     <dependencies>
