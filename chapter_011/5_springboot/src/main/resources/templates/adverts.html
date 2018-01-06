@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <title>Mini avito spring boot</title>
+</head>
+<body>
+<h2>Mini avito spring boot</h2>
+<form th:action="@{/adverts}" method="post">
+    <div><label> Advert description : <input type="text" name="description"/> </label></div>
+    <br/><br/>
+    car brand :
+    <select name="carBrand">
+        <option th:each="carBrand : ${carBrands}"
+                th:value="${carBrand.id}"
+                th:utext="${carBrand.name}">
+        </option>
+    </select>
+    <br/><br/>
+    car model :
+    <select name="carModel">
+        <option th:each="carModel : ${carModels}"
+                th:value="${carModel.id}"
+                th:utext="${carModel.name}">
+        </option>
+    </select>
+    <br/><br/>
+    <div><input type="submit" value="Add"/></div>
+    <br/><br/>
+</form>
+
+<table border="1">
+    <thead>
+    <tr>
+        <th>id</th>
+        <th>Description</th>
+        <th>Car brand</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="advert: ${adverts}">
+        <td th:text="${advert.id}"></td>
+        <td th:text="${advert.description}"></td>
+        <td th:text="${advert.carBrand.name}"></td>
+        <td th:text="${advert.carModel.name}"></td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

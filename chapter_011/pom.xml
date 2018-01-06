@@ -17,6 +17,7 @@
         <module>2_mvc</module>
         <module>3_springdata</module>
         <module>4_Security</module>
+        <module>5_springboot</module>
     </modules>
 
     <dependencies>
